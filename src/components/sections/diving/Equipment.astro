@@ -1,0 +1,96 @@
+---
+/** -36m. What is provided, what to bring. */
+import { getEntry, render } from 'astro:content';
+import Placeholder from '../../primitives/Placeholder.astro';
+import { isPlaceholder } from '../../../lib/placeholders';
+
+const entry = await getEntry('pages', 'equipment');
+if (!entry) throw new Error('Missing src/content/pages/equipment.md');
+const { Content } = await render(entry);
+
+const lists = [
+	{ heading: 'Provided', items: entry.data.provided ?? [] },
+	{ heading: 'Bring your own', items: entry.data.bringYourOwn ?? [] },
+];
+---
+
+<section class="section equipment" id="equipment" aria-labelledby="equipment-heading">
+	<div class="container">
+		<p class="eyebrow">Equipment</p>
+		<h2 id="equipment-heading">{entry.data.title}</h2>
+		{entry.data.intro && <p class="equipment__lede prose">{entry.data.intro}</p>}
+
+		<div class="equipment__lists">
+			{
+				lists.map((list) => (
+					<div class="kit">
+						<h3 class="kit__heading">{list.heading}</h3>
+						<ul class="kit__list">
+							{list.items.map((item) => (
+								<li>{isPlaceholder(item) ? <Placeholder value={item} /> : item}</li>
+							))}
+						</ul>
+					</div>
+				))
+			}
+		</div>
+
+		<div class="prose equipment__prose">
+			<Content />
+		</div>
+	</div>
+</section>
+
+<style>
+	.equipment {
+		padding-inline-start: var(--rail-width);
+	}
+
+	.equipment__lede {
+		margin-block-start: var(--space-sm);
+		color: var(--fg-muted);
+	}
+
+	.equipment__lists {
+		display: grid;
+		gap: var(--space-lg);
+		margin-block-start: var(--space-lg);
+	}
+
+	.kit {
+		padding: var(--space-md);
+		background-color: var(--bg-raised);
+		border-radius: var(--radius-lg);
+	}
+
+	.kit__heading {
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		font-weight: var(--weight-medium);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-caps);
+		color: var(--fg-muted);
+	}
+
+	.kit__list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2xs);
+		align-items: flex-start;
+		margin: 0;
+		margin-block-start: var(--space-sm);
+		padding: 0;
+		list-style: none;
+	}
+
+	.equipment__prose {
+		margin-block-start: var(--space-lg);
+		color: var(--fg-muted);
+	}
+
+	@media (min-width: 768px) {
+		.equipment__lists {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+</style>

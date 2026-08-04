@@ -78,6 +78,12 @@ const courses = defineCollection({
 		priceNote: z.string().optional(),
 		/** Who the course is for, in a sentence. */
 		suitableFor: z.string(),
+		/**
+		 * How this course is referred to in the prefilled WhatsApp message.
+		 * Defaults to "the <title> course", which does not suit every entry —
+		 * a try dive is not a course.
+		 */
+		enquiryLabel: z.string().optional(),
 		prerequisites: z.string().optional(),
 		includes: z.array(z.string()).default([]),
 		draft: z.boolean().default(false),

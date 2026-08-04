@@ -1,0 +1,165 @@
+---
+/**
+ * One course. Its CTA uses the dive centre's WhatsApp line, not the inn's,
+ * and prefills the course name.
+ */
+import Placeholder from './primitives/Placeholder.astro';
+import Stat from './primitives/Stat.astro';
+import WhatsAppLink from './WhatsAppLink.astro';
+import { isPlaceholder } from '../lib/placeholders';
+
+interface Props {
+	title: string;
+	agency: string;
+	duration: string;
+	price: string;
+	priceNote?: string;
+	suitableFor: string;
+	/** How the course is named in the prefilled enquiry. */
+	enquiryLabel?: string;
+	prerequisites?: string;
+	includes?: string[];
+}
+
+const {
+	title,
+	agency,
+	duration,
+	price,
+	priceNote,
+	suitableFor,
+	enquiryLabel,
+	prerequisites,
+	includes = [],
+} = Astro.props;
+
+const context = enquiryLabel ?? `the ${title} course`;
+
+const headingId = `course-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+---
+
+<article class="course" aria-labelledby={headingId}>
+	<div class="course__head">
+		<h3 class="course__title" id={headingId}>{title}</h3>
+		<p class="course__agency">
+			{isPlaceholder(agency) ? <Placeholder value={agency} /> : <span class="data">{agency}</span>}
+		</p>
+	</div>
+
+	<dl class="course__stats">
+		<Stat label="Duration" value={duration} />
+		<Stat label="Price" value={price} emphasis />
+		{priceNote && <Stat label="Price covers" value={priceNote} />}
+	</dl>
+
+	<p class="course__suitable">{suitableFor}</p>
+
+	<div class="prose course__prose">
+		<slot />
+	</div>
+
+	{
+		prerequisites && (
+			<p class="course__prereq">
+				<span class="course__prereq-label">You need</span>{' '}
+				{isPlaceholder(prerequisites) ? <Placeholder value={prerequisites} /> : prerequisites}
+			</p>
+		)
+	}
+
+	{
+		includes.length > 0 && (
+			<div class="course__includes">
+				<p class="course__includes-label">Includes</p>
+				<ul class="course__includes-list">
+					{includes.map((item) => (
+						<li>{isPlaceholder(item) ? <Placeholder value={item} /> : item}</li>
+					))}
+				</ul>
+			</div>
+		)
+	}
+
+	<div class="course__cta">
+		<WhatsAppLink channel="dive" context={context} label="Ask about this" variant="ghost" />
+	</div>
+</article>
+
+<style>
+	.course {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		padding: var(--space-md);
+		background-color: var(--bg-raised);
+		border-radius: var(--radius-lg);
+	}
+
+	.course__title {
+		font-size: var(--text-xl);
+	}
+
+	.course__agency {
+		margin-block-start: var(--space-3xs);
+		color: var(--fg-muted);
+	}
+
+	.course__stats {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-sm) var(--space-lg);
+		margin: 0;
+		margin-block-start: var(--space-md);
+		padding-block: var(--space-sm);
+		border-block: 1px solid var(--rule);
+	}
+
+	.course__suitable {
+		margin-block-start: var(--space-md);
+		font-weight: var(--weight-medium);
+	}
+
+	.course__prose {
+		margin-block-start: var(--space-2xs);
+		color: var(--fg-muted);
+	}
+
+	.course__prereq {
+		margin-block-start: var(--space-md);
+		font-size: var(--text-sm);
+	}
+
+	.course__prereq-label,
+	.course__includes-label {
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-caps);
+		color: var(--fg-muted);
+	}
+
+	.course__includes {
+		margin-block-start: var(--space-md);
+	}
+
+	.course__includes-list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3xs);
+		align-items: flex-start;
+		margin: 0;
+		margin-block-start: var(--space-2xs);
+		padding: 0;
+		list-style: none;
+		font-size: var(--text-sm);
+	}
+
+	.course__cta {
+		margin-block-start: auto;
+		padding-block-start: var(--space-lg);
+	}
+
+	.course__cta :global(a) {
+		width: 100%;
+	}
+</style>

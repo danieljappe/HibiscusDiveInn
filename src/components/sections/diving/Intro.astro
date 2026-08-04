@@ -1,0 +1,103 @@
+---
+/**
+ * -12m. The page header, continuing the descent from the homepage teaser.
+ * Carries the page's single <h1>.
+ */
+import { getEntry, render } from 'astro:content';
+import Photo from '../../primitives/Photo.astro';
+
+const entry = await getEntry('pages', 'diving-intro');
+if (!entry) throw new Error('Missing src/content/pages/diving-intro.md');
+const { Content } = await render(entry);
+---
+
+<section class="intro" id="diving-intro">
+	<div class="intro__media">
+		{
+			entry.data.image && (
+				<Photo src={entry.data.image} alt={entry.data.imageAlt ?? ''} priority sizes="100vw" />
+			)
+		}
+	</div>
+
+	<div class="intro__body container">
+		<p class="eyebrow">Diving</p>
+		<h1 class="intro__title">{entry.data.title}</h1>
+		{entry.data.intro && <p class="intro__lede">{entry.data.intro}</p>}
+	</div>
+
+	<div class="container intro__prose-wrap">
+		<div class="prose intro__prose">
+			<Content />
+		</div>
+	</div>
+</section>
+
+<style>
+	.intro {
+		position: relative;
+		padding-block-end: var(--space-section);
+	}
+
+	.intro__media {
+		position: relative;
+		height: min(52svh, 30rem);
+		overflow: hidden;
+	}
+
+	.intro__media :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	/* Fades the photo into the page rather than cutting it off. */
+	.intro__media::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			to bottom,
+			rgb(8 32 46 / 0.5) 0%,
+			rgb(8 32 46 / 0.7) 55%,
+			var(--abyss) 100%
+		);
+	}
+
+	.intro__body {
+		position: relative;
+		z-index: 1;
+		margin-block-start: -6rem;
+		padding-inline-start: calc(var(--gutter) + var(--rail-width));
+	}
+
+	.intro__title {
+		margin-block-start: var(--space-2xs);
+	}
+
+	.intro__lede {
+		max-width: 46ch;
+		margin-block-start: var(--space-md);
+		font-size: var(--text-lg);
+		color: var(--fg-muted);
+	}
+
+	.intro__prose-wrap {
+		padding-inline-start: calc(var(--gutter) + var(--rail-width));
+	}
+
+	.intro__prose {
+		margin-block-start: var(--space-lg);
+		color: var(--fg-muted);
+	}
+
+	@media (min-width: 768px) {
+		.intro__media {
+			height: min(60svh, 34rem);
+		}
+
+		.intro__body {
+			margin-block-start: -8rem;
+		}
+	}
+</style>

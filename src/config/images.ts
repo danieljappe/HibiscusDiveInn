@@ -67,6 +67,48 @@ export const IMAGE_MANIFEST: readonly ImageSpec[] = [
 			'An underwater photo with a diver in it. This one carries the transition into the dark half of the site, so darker and bluer is better than bright and sunny.',
 		usedOn: 'Homepage, diving teaser',
 	},
+	{
+		file: 'diving-header.jpg',
+		width: 2400,
+		height: 1400,
+		placeholderColour: '#08202E',
+		brief:
+			'The best underwater photo you have — wide, deep blue, ideally with a diver for scale. It sits behind the heading at the top of the diving page.',
+		usedOn: '/diving header',
+	},
+	{
+		file: 'dive-site-house-reef.jpg',
+		width: 1600,
+		height: 1200,
+		placeholderColour: '#1A5A6E',
+		brief: 'The house reef underwater — coral, fish, whatever is characteristic of it.',
+		usedOn: '/diving, dive sites',
+	},
+	{
+		file: 'dive-site-two.jpg',
+		width: 1600,
+		height: 1200,
+		placeholderColour: '#16495C',
+		brief: 'The second dive site. Rename the file once the site has a name.',
+		usedOn: '/diving, dive sites',
+	},
+	{
+		file: 'dive-site-three.jpg',
+		width: 1600,
+		height: 1200,
+		placeholderColour: '#123A4A',
+		brief: 'The third dive site. Rename the file once the site has a name.',
+		usedOn: '/diving, dive sites',
+	},
+	{
+		file: 'instructor.jpg',
+		width: 1200,
+		height: 1500,
+		placeholderColour: '#2E6E7E',
+		brief:
+			'A portrait of the instructor. A real photo of a person, not a stock image — this relationship is what guests are actually buying. Portrait orientation.',
+		usedOn: '/diving, instructor section',
+	},
 ];
 
 /** Looks up a spec by filename. Throws early if a content file names an unknown image. */

@@ -1,0 +1,35 @@
+---
+/**
+ * /diving — submerged. Dark palette throughout, continuing down from the
+ * homepage teaser at -12m.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+import Intro from '../components/sections/diving/Intro.astro';
+import DiveSites from '../components/sections/diving/DiveSites.astro';
+import Courses from '../components/sections/diving/Courses.astro';
+import Equipment from '../components/sections/diving/Equipment.astro';
+import Instructor from '../components/sections/diving/Instructor.astro';
+import DiveContact from '../components/sections/diving/DiveContact.astro';
+
+import { SITE } from '../config/site';
+
+const description =
+	`Diving on ${SITE.place.island}, ${SITE.place.province}. A house reef you can walk into, ` +
+	`small groups, and courses with a single instructor.`;
+---
+
+<BaseLayout title="Diving" description={description} theme="deep">
+	<Header slot="header" current="diving" />
+
+	<Intro />
+	<DiveSites />
+	<Courses />
+	<Equipment />
+	<Instructor />
+	<DiveContact />
+
+	<Footer slot="footer" theme="deep" />
+</BaseLayout>

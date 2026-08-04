@@ -1,0 +1,84 @@
+---
+/** -32m. Courses, each linking to the dive centre's WhatsApp line. */
+import { getCollection, render } from 'astro:content';
+import CourseCard from '../../CourseCard.astro';
+
+const courses = (await getCollection('courses', ({ data }) => !data.draft)).sort(
+	(a, b) => a.data.order - b.data.order,
+);
+
+const rendered = await Promise.all(
+	courses.map(async (course) => ({ course, Content: (await render(course)).Content })),
+);
+---
+
+<section class="section courses" id="courses" aria-labelledby="courses-heading">
+	<div class="container">
+		<p class="eyebrow">Courses</p>
+		<h2 id="courses-heading">Learning to dive here</h2>
+		<p class="courses__lede prose">
+			Courses run all year. Because there is one instructor, dates depend on who else is booked —
+			ask early if you are travelling to a fixed schedule.
+		</p>
+
+		<ul class="courses__grid" role="list">
+			{
+				rendered.map(({ course, Content }) => (
+					<li>
+						<CourseCard
+							title={course.data.title}
+							agency={course.data.agency}
+							duration={course.data.duration}
+							price={course.data.price}
+							priceNote={course.data.priceNote}
+							suitableFor={course.data.suitableFor}
+							enquiryLabel={course.data.enquiryLabel}
+							prerequisites={course.data.prerequisites}
+							includes={course.data.includes}
+						>
+							<Content />
+						</CourseCard>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</section>
+
+<style>
+	.courses {
+		padding-inline-start: var(--rail-width);
+		background-color: var(--bg-sunk);
+	}
+
+	.courses__lede {
+		margin-block-start: var(--space-sm);
+		color: var(--fg-muted);
+	}
+
+	.courses__grid {
+		display: grid;
+		gap: var(--space-md);
+		margin: 0;
+		margin-block-start: var(--space-lg);
+		padding: 0;
+		list-style: none;
+	}
+
+	.courses__grid > li {
+		display: flex;
+	}
+
+	@media (min-width: 768px) {
+		.courses__grid {
+			grid-template-columns: repeat(2, 1fr);
+			gap: var(--space-lg);
+		}
+	}
+
+	@media (min-width: 1200px) {
+		.courses__grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+</style>

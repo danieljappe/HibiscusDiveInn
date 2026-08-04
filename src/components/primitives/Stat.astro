@@ -1,0 +1,51 @@
+---
+/**
+ * A labelled data point — depth, difficulty, boat time, duration, price.
+ *
+ * Mono here is not decoration: it makes dive data read like a dive computer or
+ * a logbook, which is the vernacular of the audience.
+ */
+import Placeholder from './Placeholder.astro';
+import { isPlaceholder } from '../../lib/placeholders';
+
+interface Props {
+	label: string;
+	value: string;
+	/** Renders larger, for the one figure that matters most in a card. */
+	emphasis?: boolean;
+}
+
+const { label, value, emphasis = false } = Astro.props;
+---
+
+<div class:list={['stat', emphasis && 'stat--emphasis']}>
+	<dt class="stat__label">{label}</dt>
+	<dd class="stat__value">
+		{isPlaceholder(value) ? <Placeholder value={value} /> : <span class="data">{value}</span>}
+	</dd>
+</div>
+
+<style>
+	.stat {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3xs);
+	}
+
+	.stat__label {
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-caps);
+		color: var(--fg-muted);
+	}
+
+	.stat__value {
+		margin: 0;
+	}
+
+	.stat--emphasis .stat__value {
+		font-size: var(--text-lg);
+		font-weight: var(--weight-medium);
+	}
+</style>

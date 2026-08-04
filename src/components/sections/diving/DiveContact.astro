@@ -1,0 +1,54 @@
+---
+/**
+ * -44m, the deepest point of the site. Uses the dive centre's line with
+ * diving context already prefilled.
+ */
+import ContactMethods from '../../ContactMethods.astro';
+---
+
+<section class="section dive-contact" id="dive-contact" aria-labelledby="dive-contact-heading">
+	<div class="container dive-contact__inner">
+		<p class="eyebrow">Get in touch</p>
+		<h2 id="dive-contact-heading">Tell us what you want to dive</h2>
+		<p class="dive-contact__lede prose">
+			Message the dive centre directly. Say whether you are certified, roughly when you are coming,
+			and how many of you there are — that is enough for us to tell you what is possible.
+		</p>
+
+		<div class="dive-contact__cta">
+			<ContactMethods channel="dive" label="Ask about diving" align="start" />
+		</div>
+
+		<p class="dive-contact__alt">
+			Asking about a room as well? <a href="/#contact">The inn has its own number</a>.
+		</p>
+	</div>
+</section>
+
+<style>
+	.dive-contact {
+		padding-inline-start: var(--rail-width);
+	}
+
+	.dive-contact__lede {
+		margin-block-start: var(--space-sm);
+		color: var(--fg-muted);
+	}
+
+	.dive-contact__cta {
+		margin-block-start: var(--space-lg);
+	}
+
+	.dive-contact__alt {
+		margin-block-start: var(--space-lg);
+		font-size: var(--text-sm);
+		color: var(--fg-muted);
+	}
+
+	.dive-contact__alt a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+		font-weight: var(--weight-medium);
+	}
+</style>

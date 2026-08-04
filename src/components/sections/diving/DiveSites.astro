@@ -1,0 +1,76 @@
+---
+/**
+ * -14m downward. Sites are listed in authored order until real depth data
+ * exists; once every site has a depthMaxM the rail sorts by actual depth.
+ * See src/config/depths.ts.
+ */
+import { getCollection, render } from 'astro:content';
+import DiveSiteCard from '../../DiveSiteCard.astro';
+
+const sites = (await getCollection('diveSites', ({ data }) => !data.draft)).sort(
+	(a, b) => a.data.order - b.data.order,
+);
+
+const rendered = await Promise.all(
+	sites.map(async (site) => ({ site, Content: (await render(site)).Content })),
+);
+---
+
+<section class="section sites" id="dive-sites" aria-labelledby="sites-heading">
+	<div class="container">
+		<p class="eyebrow">Dive sites</p>
+		<h2 id="sites-heading">Where we dive</h2>
+		<p class="sites__lede prose">
+			The house reef is a walk from the door. The rest are a boat ride away — how far depends on the
+			site and the weather.
+		</p>
+
+		<ul class="sites__list" role="list">
+			{
+				rendered.map(({ site, Content }) => (
+					<li>
+						<DiveSiteCard
+							id={site.id}
+							title={site.data.title}
+							depthRange={site.data.depthRange}
+							difficulty={site.data.difficulty}
+							boatTime={site.data.boatTime}
+							highlights={site.data.highlights}
+							image={site.data.image}
+							imageAlt={site.data.imageAlt}
+						>
+							<Content />
+						</DiveSiteCard>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</section>
+
+<style>
+	.sites {
+		padding-inline-start: var(--rail-width);
+	}
+
+	.sites__lede {
+		margin-block-start: var(--space-sm);
+		color: var(--fg-muted);
+	}
+
+	.sites__list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-md);
+		margin: 0;
+		margin-block-start: var(--space-lg);
+		padding: 0;
+		list-style: none;
+	}
+
+	@media (min-width: 768px) {
+		.sites__list {
+			gap: var(--space-lg);
+		}
+	}
+</style>

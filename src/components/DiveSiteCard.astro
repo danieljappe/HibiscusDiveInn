@@ -1,0 +1,128 @@
+---
+/**
+ * One dive site. Depth and difficulty are mono, per the brief.
+ *
+ * Site names are operational facts, so an unnamed site carries a placeholder
+ * in its heading rather than an invented name.
+ */
+import Photo from './primitives/Photo.astro';
+import Placeholder from './primitives/Placeholder.astro';
+import Stat from './primitives/Stat.astro';
+import { isPlaceholder } from '../lib/placeholders';
+
+interface Props {
+	id: string;
+	title: string;
+	depthRange: string;
+	difficulty: string;
+	boatTime: string;
+	highlights: string[];
+	image: string;
+	imageAlt: string;
+}
+
+const { id, title, depthRange, difficulty, boatTime, highlights, image, imageAlt } = Astro.props;
+
+const headingId = `dive-site-${id}`;
+---
+
+<article class="site" id={headingId} aria-labelledby={`${headingId}-heading`}>
+	<div class="site__media">
+		<Photo src={image} alt={imageAlt} sizes="(min-width: 768px) 40vw, 92vw" />
+	</div>
+
+	<div class="site__body">
+		<h3 class="site__title" id={`${headingId}-heading`}>
+			{isPlaceholder(title) ? <Placeholder value={title} /> : title}
+		</h3>
+
+		<dl class="site__stats">
+			<Stat label="Depth" value={depthRange} emphasis />
+			<Stat label="Difficulty" value={difficulty} />
+			<Stat label="Boat time" value={boatTime} />
+		</dl>
+
+		<div class="site__highlights">
+			<p class="site__highlights-label">What you see</p>
+			<ul class="site__highlights-list">
+				{
+					highlights.map((highlight) => (
+						<li>{isPlaceholder(highlight) ? <Placeholder value={highlight} /> : highlight}</li>
+					))
+				}
+			</ul>
+		</div>
+
+		<div class="prose site__prose">
+			<slot />
+		</div>
+	</div>
+</article>
+
+<style>
+	.site {
+		display: grid;
+		gap: var(--space-md);
+		padding: var(--space-md);
+		background-color: var(--bg-raised);
+		border-radius: var(--radius-lg);
+	}
+
+	.site__media :global(img) {
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		object-fit: cover;
+		border-radius: var(--radius-md);
+	}
+
+	.site__title {
+		font-size: var(--text-xl);
+	}
+
+	.site__stats {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-sm) var(--space-lg);
+		margin: 0;
+		margin-block-start: var(--space-sm);
+		padding-block: var(--space-sm);
+		border-block: 1px solid var(--rule);
+	}
+
+	.site__highlights {
+		margin-block-start: var(--space-md);
+	}
+
+	.site__highlights-label {
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-caps);
+		color: var(--fg-muted);
+	}
+
+	.site__highlights-list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3xs);
+		align-items: flex-start;
+		margin: 0;
+		margin-block-start: var(--space-2xs);
+		padding: 0;
+		list-style: none;
+	}
+
+	.site__prose {
+		margin-block-start: var(--space-md);
+		color: var(--fg-muted);
+	}
+
+	@media (min-width: 768px) {
+		.site {
+			grid-template-columns: 2fr 3fr;
+			gap: var(--space-lg);
+			padding: var(--space-lg);
+			align-items: start;
+		}
+	}
+</style>
