@@ -3,10 +3,10 @@
  * -2m. Two or three short paragraphs, plainly written. All copy comes from
  * src/content/pages/about.md.
  */
-import { getEntry, render } from 'astro:content';
+import { render } from 'astro:content';
+import { requirePage } from '../../../lib/content';
 
-const entry = await getEntry('pages', 'about');
-if (!entry) throw new Error('Missing src/content/pages/about.md');
+const entry = await requirePage('about');
 const { Content } = await render(entry);
 ---
 

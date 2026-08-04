@@ -7,13 +7,13 @@
  * Durations, fares and timetables are placeholders until the owner confirms
  * them. None of it is invented here.
  */
-import { getEntry, render } from 'astro:content';
+import { render } from 'astro:content';
+import { requirePage } from '../../../lib/content';
 import Stat from '../../primitives/Stat.astro';
 import Placeholder from '../../primitives/Placeholder.astro';
 import { isPlaceholder } from '../../../lib/placeholders';
 
-const entry = await getEntry('pages', 'getting-here');
-if (!entry) throw new Error('Missing src/content/pages/getting-here.md');
+const entry = await requirePage('getting-here');
 const { Content } = await render(entry);
 
 const legs = entry.data.legs ?? [];

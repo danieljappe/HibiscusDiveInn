@@ -4,13 +4,13 @@
  * the actual product, so this section gets a full-width portrait and room to
  * breathe rather than a byline at the bottom of the page.
  */
-import { getEntry, render } from 'astro:content';
+import { render } from 'astro:content';
+import { requirePage } from '../../../lib/content';
 import Photo from '../../primitives/Photo.astro';
 import Placeholder from '../../primitives/Placeholder.astro';
 import { isPlaceholder } from '../../../lib/placeholders';
 
-const entry = await getEntry('pages', 'instructor');
-if (!entry) throw new Error('Missing src/content/pages/instructor.md');
+const entry = await requirePage('instructor');
 const { Content } = await render(entry);
 
 const certifications = entry.data.certifications ?? [];

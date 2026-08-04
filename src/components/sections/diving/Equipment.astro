@@ -1,11 +1,11 @@
 ---
 /** -36m. What is provided, what to bring. */
-import { getEntry, render } from 'astro:content';
+import { render } from 'astro:content';
+import { requirePage } from '../../../lib/content';
 import Placeholder from '../../primitives/Placeholder.astro';
 import { isPlaceholder } from '../../../lib/placeholders';
 
-const entry = await getEntry('pages', 'equipment');
-if (!entry) throw new Error('Missing src/content/pages/equipment.md');
+const entry = await requirePage('equipment');
 const { Content } = await render(entry);
 
 const lists = [

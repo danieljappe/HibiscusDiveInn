@@ -4,11 +4,11 @@
  * section runs the deep theme on an otherwise sand-coloured page, so scrolling
  * into it reads as descending.
  */
-import { getEntry, render } from 'astro:content';
+import { render } from 'astro:content';
+import { requirePage } from '../../../lib/content';
 import Photo from '../../primitives/Photo.astro';
 
-const entry = await getEntry('pages', 'diving-teaser');
-if (!entry) throw new Error('Missing src/content/pages/diving-teaser.md');
+const entry = await requirePage('diving-teaser');
 const { Content } = await render(entry);
 ---
 
