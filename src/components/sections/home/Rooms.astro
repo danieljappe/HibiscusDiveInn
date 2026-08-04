@@ -20,11 +20,12 @@ const rooms = (await getCollection('rooms', ({ data }) => !data.draft)).sort(
 			costs for your dates.
 		</p>
 
-		<ul class="rooms__grid" role="list">
+		<ul class="rooms__list" role="list">
 			{
-				rooms.map((room) => (
+				rooms.map((room, index) => (
 					<li>
 						<RoomCard
+							open={index === 0}
 							title={room.data.title}
 							sleeps={room.data.sleeps}
 							summary={room.data.summary}
@@ -52,25 +53,19 @@ const rooms = (await getCollection('rooms', ({ data }) => !data.draft)).sort(
 		color: var(--fg-muted);
 	}
 
-	.rooms__grid {
-		display: grid;
-		gap: var(--space-md);
+	/*
+	 * Accordions stack full width rather than sitting in the two-column grid
+	 * the brief describes for cards. Exclusive <details> in two columns makes
+	 * the row jump when a taller panel opens beside a shorter one.
+	 */
+	.rooms__list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2xs);
+		max-width: 56rem;
 		margin: 0;
 		margin-block-start: var(--space-lg);
 		padding: 0;
 		list-style: none;
-	}
-
-	@media (min-width: 768px) {
-		.rooms__grid {
-			grid-template-columns: repeat(2, 1fr);
-			gap: var(--space-lg);
-		}
-	}
-
-	@media (min-width: 1200px) {
-		.rooms__grid {
-			gap: var(--space-xl);
-		}
 	}
 </style>

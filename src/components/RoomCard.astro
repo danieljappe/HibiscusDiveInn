@@ -1,7 +1,14 @@
 ---
 /**
- * One room type. The CTA deep-links to WhatsApp with the room name already
- * in the message, so the owner knows which room is being asked about.
+ * One room type, as an accordion.
+ *
+ * Built on native <details>, so it costs no JavaScript and still works with
+ * scripting disabled — keyboard operation, focus and the expanded/collapsed
+ * state are all the browser's own. The shared `name` makes the group
+ * exclusive: opening one room closes the others. Browsers without support for
+ * that attribute simply allow several open at once, which is a fine fallback.
+ *
+ * The CTA deep-links to WhatsApp with the room name already in the message.
  */
 import Photo from './primitives/Photo.astro';
 import Placeholder from './primitives/Placeholder.astro';
@@ -18,95 +25,174 @@ interface Props {
 	features?: string[];
 	image: string;
 	imageAlt: string;
+	/** Expanded on load. The first room is open so the section is not a wall of bars. */
+	open?: boolean;
 }
 
-const { title, sleeps, summary, rate, rateNote, features = [], image, imageAlt } = Astro.props;
-
-const headingId = `room-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+const {
+	title,
+	sleeps,
+	summary,
+	rate,
+	rateNote,
+	features = [],
+	image,
+	imageAlt,
+	open = false,
+} = Astro.props;
 ---
 
-<article class="room" aria-labelledby={headingId}>
-	<div class="room__media">
-		<Photo src={image} alt={imageAlt} sizes="(min-width: 768px) 45vw, 92vw" />
-	</div>
+<details class="room" name="rooms" open={open}>
+	<summary class="room__bar">
+		<span class="room__bar-text">
+			<h3 class="room__title">{title}</h3>
+			<span class="room__sleeps data">Sleeps {sleeps}</span>
+		</span>
 
-	<div class="room__body">
-		<h3 class="room__title" id={headingId}>{title}</h3>
+		<svg class="room__chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+			<path
+				d="M6 9l6 6 6-6"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"></path>
+		</svg>
+	</summary>
 
-		<p class="room__capacity">
-			<span class="data">Sleeps {sleeps}</span>
-		</p>
+	<div class="room__panel">
+		<div class="room__media">
+			<Photo src={image} alt={imageAlt} sizes="(min-width: 768px) 45vw, 92vw" />
+		</div>
 
-		<p class="room__summary">{summary}</p>
+		<div class="room__body">
+			<p class="room__summary">{summary}</p>
 
-		{
-			features.length > 0 && (
-				<ul class="room__features">
-					{features.map((feature) => (
-						<li>{feature}</li>
-					))}
-				</ul>
-			)
-		}
-
-		<p class="room__rate">
 			{
-				isPlaceholder(rate) ? (
-					<Placeholder value={rate} />
-				) : (
-					<span class="data room__rate-value">{rate}</span>
+				features.length > 0 && (
+					<ul class="room__features">
+						{features.map((feature) => (
+							<li>{feature}</li>
+						))}
+					</ul>
 				)
 			}
-			{
-				rateNote &&
-					(isPlaceholder(rateNote) ? (
-						<Placeholder value={rateNote} />
-					) : (
-						<span class="room__rate-note">{rateNote}</span>
-					))
-			}
-		</p>
 
-		<div class="room__cta">
-			<WhatsAppLink channel="inn" context={`the ${title}`} label="Ask about this room" />
+			<p class="room__rate">
+				{
+					isPlaceholder(rate) ? (
+						<Placeholder value={rate} />
+					) : (
+						<span class="data room__rate-value">{rate}</span>
+					)
+				}
+				{
+					rateNote &&
+						(isPlaceholder(rateNote) ? (
+							<Placeholder value={rateNote} />
+						) : (
+							<span class="room__rate-note">{rateNote}</span>
+						))
+				}
+			</p>
+
+			<div class="room__cta">
+				<WhatsAppLink channel="inn" context={`the ${title}`} label="Ask about this room" />
+			</div>
 		</div>
 	</div>
-</article>
+</details>
 
 <style>
 	.room {
-		display: flex;
-		flex-direction: column;
 		overflow: hidden;
 		background-color: var(--bg-raised);
 		border-radius: var(--radius-lg);
 	}
 
-	.room__media :global(img) {
-		width: 100%;
-		aspect-ratio: 4 / 3;
-		object-fit: cover;
+	/* ---- The bar ---------------------------------------------------------- */
+
+	.room__bar {
+		display: flex;
+		gap: var(--space-sm);
+		align-items: center;
+		justify-content: space-between;
+		/* 44px tap target, comfortably exceeded. */
+		min-height: 44px;
+		padding: var(--space-md);
+		cursor: pointer;
+		list-style: none;
+		transition: background-color var(--duration-base) var(--ease-out);
 	}
 
-	.room__body {
+	/* Suppress the default disclosure triangle in both engines. */
+	.room__bar::-webkit-details-marker {
+		display: none;
+	}
+
+	.room__bar::marker {
+		content: '';
+	}
+
+	.room__bar:hover {
+		background-color: color-mix(in srgb, var(--fg) 5%, transparent);
+	}
+
+	/*
+	 * The focus ring belongs on the bar itself, not the whole card — outlining
+	 * an open accordion would draw a box around the entire panel.
+	 */
+	.room__bar:focus-visible {
+		outline: 3px solid var(--focus-ring);
+		outline-offset: -3px;
+	}
+
+	.room__bar-text {
 		display: flex;
-		flex: 1;
-		flex-direction: column;
-		gap: var(--space-2xs);
-		padding: var(--space-md);
+		flex-wrap: wrap;
+		gap: var(--space-3xs) var(--space-sm);
+		align-items: baseline;
 	}
 
 	.room__title {
 		font-size: var(--text-xl);
 	}
 
-	.room__capacity {
+	.room__sleeps {
 		color: var(--fg-muted);
 	}
 
-	.room__summary {
-		margin-block-start: var(--space-3xs);
-		color: var(--fg);
+	.room__chevron {
+		width: 1.5rem;
+		height: 1.5rem;
+		flex: none;
+		color: var(--fg-muted);
+		transition: transform var(--duration-base) var(--ease-out);
+	}
+
+	.room[open] .room__chevron {
+		transform: rotate(180deg);
+	}
+
+	/* ---- The panel -------------------------------------------------------- */
+
+	.room__panel {
+		display: grid;
+		gap: var(--space-md);
+		padding: 0 var(--space-md) var(--space-md);
+	}
+
+	.room__media :global(img) {
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		object-fit: cover;
+		border-radius: var(--radius-md);
+	}
+
+	.room__body {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2xs);
 	}
 
 	.room__features {
@@ -125,8 +211,7 @@ const headingId = `room-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 		flex-wrap: wrap;
 		gap: var(--space-2xs);
 		align-items: baseline;
-		margin-block-start: auto;
-		padding-block-start: var(--space-sm);
+		margin-block-start: var(--space-2xs);
 	}
 
 	.room__rate-value {
@@ -148,8 +233,26 @@ const headingId = `room-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 	}
 
 	@media (min-width: 768px) {
+		.room__bar {
+			padding-inline: var(--space-lg);
+		}
+
+		.room__panel {
+			grid-template-columns: 2fr 3fr;
+			align-items: start;
+			padding-inline: var(--space-lg);
+			padding-block-end: var(--space-lg);
+			gap: var(--space-lg);
+		}
+
 		.room__cta :global(a) {
 			width: auto;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.room__chevron {
+			transition: none;
 		}
 	}
 </style>
