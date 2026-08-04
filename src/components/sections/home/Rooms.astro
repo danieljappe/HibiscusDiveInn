@@ -1,0 +1,76 @@
+---
+/**
+ * -4m. A homepage section, not a separate page. Single column on mobile,
+ * two from 768px.
+ */
+import { getCollection } from 'astro:content';
+import RoomCard from '../../RoomCard.astro';
+
+const rooms = (await getCollection('rooms', ({ data }) => !data.draft)).sort(
+	(a, b) => a.data.order - b.data.order,
+);
+---
+
+<section class="section rooms" id="rooms" aria-labelledby="rooms-heading">
+	<div class="container">
+		<p class="eyebrow">Rooms</p>
+		<h2 id="rooms-heading">Where you sleep</h2>
+		<p class="rooms__lede prose">
+			Rates are per night and change with the season. Ask about a room and we will confirm what it
+			costs for your dates.
+		</p>
+
+		<ul class="rooms__grid" role="list">
+			{
+				rooms.map((room) => (
+					<li>
+						<RoomCard
+							title={room.data.title}
+							capacity={room.data.capacity}
+							summary={room.data.summary}
+							rate={room.data.rate}
+							rateNote={room.data.rateNote}
+							features={room.data.features}
+							image={room.data.image}
+							imageAlt={room.data.imageAlt}
+						/>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</section>
+
+<style>
+	.rooms {
+		padding-inline-start: var(--rail-width);
+		background-color: var(--bg-sunk);
+	}
+
+	.rooms__lede {
+		margin-block-start: var(--space-sm);
+		color: var(--fg-muted);
+	}
+
+	.rooms__grid {
+		display: grid;
+		gap: var(--space-md);
+		margin: 0;
+		margin-block-start: var(--space-lg);
+		padding: 0;
+		list-style: none;
+	}
+
+	@media (min-width: 768px) {
+		.rooms__grid {
+			grid-template-columns: repeat(2, 1fr);
+			gap: var(--space-lg);
+		}
+	}
+
+	@media (min-width: 1200px) {
+		.rooms__grid {
+			gap: var(--space-xl);
+		}
+	}
+</style>

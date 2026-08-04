@@ -15,7 +15,8 @@
     "placeholders": "node scripts/report-placeholders.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "build:preview": "ALLOW_PLACEHOLDERS=1 astro build"
+    "build:preview": "ALLOW_PLACEHOLDERS=1 astro build",
+    "images:placeholders": "node scripts/make-placeholder-images.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

@@ -1,0 +1,188 @@
+---
+/**
+ * -20m. Bantayan is awkward to reach, and this is otherwise the most common
+ * question. Every duration and fare is a placeholder until the owner confirms
+ * the route — none of it is invented here.
+ */
+import { getEntry, render } from 'astro:content';
+import Placeholder from '../../primitives/Placeholder.astro';
+import { isPlaceholder } from '../../../lib/placeholders';
+
+const entry = await getEntry('pages', 'getting-here');
+if (!entry) throw new Error('Missing src/content/pages/getting-here.md');
+const { Content } = await render(entry);
+
+const legs = entry.data.legs ?? [];
+---
+
+<section class="section journey" id="getting-here" aria-labelledby="journey-heading">
+	<div class="container">
+		<p class="eyebrow">The journey</p>
+		<h2 id="journey-heading">{entry.data.title}</h2>
+
+		{entry.data.intro && <p class="journey__intro prose">{entry.data.intro}</p>}
+
+		<ol class="journey__legs">
+			{
+				legs.map((leg, index) => (
+					<li class="leg">
+						<span class="leg__index data" aria-hidden="true">
+							{String(index + 1).padStart(2, '0')}
+						</span>
+
+						<div class="leg__detail">
+							<p class="leg__route">
+								<span class="leg__mode data">{leg.mode}</span>
+								<span class="leg__places">
+									{leg.from} <span aria-hidden="true">&rarr;</span>{' '}
+									<span class="visually-hidden">to</span> {leg.to}
+								</span>
+							</p>
+
+							<dl class="leg__stats">
+								<div class="leg__stat">
+									<dt>Duration</dt>
+									<dd>
+										{isPlaceholder(leg.duration) ? (
+											<Placeholder value={leg.duration} />
+										) : (
+											<span class="data">{leg.duration}</span>
+										)}
+									</dd>
+								</div>
+								<div class="leg__stat">
+									<dt>Cost</dt>
+									<dd>
+										{isPlaceholder(leg.cost) ? (
+											<Placeholder value={leg.cost} />
+										) : (
+											<span class="data">{leg.cost}</span>
+										)}
+									</dd>
+								</div>
+							</dl>
+
+							{leg.note &&
+								(isPlaceholder(leg.note) ? (
+									<p class="leg__note">
+										<Placeholder value={leg.note} />
+									</p>
+								) : (
+									<p class="leg__note">{leg.note}</p>
+								))}
+						</div>
+					</li>
+				))
+			}
+		</ol>
+
+		<div class="prose journey__body">
+			<Content />
+		</div>
+	</div>
+</section>
+
+<style>
+	.journey {
+		padding-inline-start: var(--rail-width);
+	}
+
+	.journey__intro {
+		margin-block-start: var(--space-sm);
+		color: var(--fg-muted);
+	}
+
+	.journey__legs {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-sm);
+		margin: 0;
+		margin-block-start: var(--space-lg);
+		padding: 0;
+		list-style: none;
+		counter-reset: leg;
+	}
+
+	.leg {
+		display: flex;
+		gap: var(--space-sm);
+		padding: var(--space-md);
+		background-color: var(--bg-raised);
+		border-radius: var(--radius-md);
+	}
+
+	.leg__index {
+		flex: none;
+		color: var(--fg-muted);
+		font-size: var(--text-sm);
+		padding-block-start: 0.15em;
+	}
+
+	.leg__detail {
+		flex: 1;
+	}
+
+	.leg__route {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3xs);
+	}
+
+	.leg__mode {
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-caps);
+		color: var(--fg-muted);
+	}
+
+	.leg__places {
+		font-weight: var(--weight-medium);
+	}
+
+	.leg__stats {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-sm) var(--space-lg);
+		margin: 0;
+		margin-block-start: var(--space-xs);
+	}
+
+	.leg__stat dt {
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-caps);
+		font-family: var(--font-mono);
+		color: var(--fg-muted);
+	}
+
+	.leg__stat dd {
+		margin: 0;
+		margin-block-start: var(--space-3xs);
+	}
+
+	.leg__note {
+		margin-block-start: var(--space-xs);
+		font-size: var(--text-sm);
+		color: var(--fg-muted);
+	}
+
+	.journey__body {
+		margin-block-start: var(--space-lg);
+	}
+
+	@media (min-width: 768px) {
+		.leg {
+			padding: var(--space-md) var(--space-lg);
+		}
+
+		.leg__route {
+			flex-direction: row;
+			align-items: baseline;
+			gap: var(--space-sm);
+		}
+
+		.leg__mode {
+			min-width: 5rem;
+		}
+	}
+</style>

@@ -1,16 +1,35 @@
 ---
 /**
- * Scaffold placeholder. The real homepage — hero, about, rooms, diving teaser,
- * getting here, contact — is built in the next stage.
+ * The homepage: one scroll from the surface down to -30m.
+ *
+ * Sections carry the ids the depth rail keys off (see src/config/depths.ts).
+ * The rail itself arrives in the polish stage.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+import Hero from '../components/sections/home/Hero.astro';
+import About from '../components/sections/home/About.astro';
+import Rooms from '../components/sections/home/Rooms.astro';
+import DivingTeaser from '../components/sections/home/DivingTeaser.astro';
+import GettingHere from '../components/sections/home/GettingHere.astro';
+import Contact from '../components/sections/home/Contact.astro';
+
 import { SITE } from '../config/site';
+
+const description = `${SITE.description} Enquiries by WhatsApp.`;
 ---
 
-<BaseLayout title={SITE.name} description={SITE.description} theme="surface">
-	<div class="container section">
-		<p class="eyebrow">{SITE.place.island}, {SITE.place.province}</p>
-		<h1>{SITE.name}</h1>
-		<p class="prose">{SITE.tagline}</p>
-	</div>
+<BaseLayout title={SITE.name} description={description} theme="surface">
+	<Header slot="header" current="home" />
+
+	<Hero />
+	<About />
+	<Rooms />
+	<DivingTeaser />
+	<GettingHere />
+	<Contact />
+
+	<Footer slot="footer" theme="deep" />
 </BaseLayout>

@@ -1,0 +1,92 @@
+---
+/**
+ * Minimal chrome. Two pages, so two links — the site is a scroll, not a
+ * hierarchy, and the depth rail is decoration rather than navigation.
+ */
+import { SITE } from '../config/site';
+
+interface Props {
+	/** Marks the current page for aria-current. */
+	current: 'home' | 'diving';
+}
+
+const { current } = Astro.props;
+---
+
+<header class="site-header">
+	<nav class="site-header__inner container" aria-label="Main">
+		<a class="site-header__brand" href="/" aria-current={current === 'home' ? 'page' : undefined}>
+			{SITE.name}
+		</a>
+
+		<ul class="site-header__links">
+			<li>
+				<a href="/" aria-current={current === 'home' ? 'page' : undefined}>Stay</a>
+			</li>
+			<li>
+				<a href="/diving" aria-current={current === 'diving' ? 'page' : undefined}>Diving</a>
+			</li>
+		</ul>
+	</nav>
+</header>
+
+<style>
+	.site-header {
+		position: relative;
+		z-index: 2;
+		padding-block: var(--space-sm);
+		/* Clear the depth rail. */
+		padding-inline-start: var(--rail-width);
+	}
+
+	.site-header__inner {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-sm);
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.site-header__brand {
+		display: inline-flex;
+		align-items: center;
+		/* 44px tap target. */
+		min-height: 44px;
+		font-family: var(--font-display);
+		font-size: var(--text-lg);
+		font-weight: var(--weight-semibold);
+		letter-spacing: var(--tracking-display-loose);
+		color: var(--fg);
+		text-decoration: none;
+	}
+
+	.site-header__links {
+		display: flex;
+		gap: var(--space-sm);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.site-header__links a {
+		display: inline-flex;
+		align-items: center;
+		/* 44px tap target. */
+		min-height: 44px;
+		padding-inline: var(--space-2xs);
+		font-size: var(--text-sm);
+		font-weight: var(--weight-medium);
+		color: var(--fg-muted);
+		text-decoration: none;
+	}
+
+	.site-header__links a:hover {
+		color: var(--fg);
+	}
+
+	.site-header__links a[aria-current='page'] {
+		color: var(--fg);
+		text-decoration: underline;
+		text-underline-offset: 0.35em;
+	}
+</style>

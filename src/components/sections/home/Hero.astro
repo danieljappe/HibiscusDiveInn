@@ -1,0 +1,121 @@
+---
+/**
+ * Surface level, 0m. Full-bleed photograph, the name, one line of positioning
+ * copy, and the primary call to action. No carousel.
+ */
+import Photo from '../../primitives/Photo.astro';
+import ContactMethods from '../../ContactMethods.astro';
+import { SITE } from '../../../config/site';
+---
+
+<section class="hero" id="hero">
+	<div class="hero__media">
+		<Photo
+			src="hero-house-reef.jpg"
+			alt="Placeholder for a wide photograph of the shoreline and house reef at Hibiscus Dive Inn"
+			priority
+			sizes="100vw"
+		/>
+	</div>
+
+	<div class="hero__body container">
+		<p class="eyebrow hero__eyebrow">
+			{SITE.place.island} &middot; {SITE.place.province} &middot; {SITE.place.country}
+		</p>
+		<h1 class="hero__title">{SITE.name}</h1>
+		<p class="hero__lede">{SITE.tagline}. Rooms, a house reef, and one instructor.</p>
+
+		<div class="hero__cta">
+			<ContactMethods channel="inn" label="Ask about a stay" />
+		</div>
+	</div>
+</section>
+
+<style>
+	.hero {
+		position: relative;
+		display: grid;
+		/* Both children occupy the same cell, so the copy sits over the photo. */
+		grid-template-areas: 'stack';
+		min-height: min(88svh, 46rem);
+		isolation: isolate;
+	}
+
+	.hero__media,
+	.hero__body {
+		grid-area: stack;
+	}
+
+	.hero__media {
+		position: relative;
+		overflow: hidden;
+	}
+
+	.hero__media :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	/*
+	 * A scrim, not a decorative gradient: it is what makes the copy legible
+	 * over an unknown photograph. Sized so the text sits on the darkest part.
+	 */
+	.hero__media::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(
+			to top,
+			rgb(8 32 46 / 0.92) 0%,
+			rgb(8 32 46 / 0.72) 38%,
+			rgb(8 32 46 / 0.35) 70%,
+			rgb(8 32 46 / 0.2) 100%
+		);
+	}
+
+	/*
+	 * The scrim is abyss, so this block runs the deep theme's tokens even
+	 * though the page around it is the surface theme. Same values as
+	 * [data-theme='deep'] in tokens.css — contrast is verified there.
+	 */
+	.hero__body {
+		z-index: 1;
+		align-self: end;
+		padding-block: var(--space-xl);
+		padding-inline-start: calc(var(--gutter) + var(--rail-width));
+
+		--fg: var(--shell);
+		--fg-muted: #a9c2cc;
+		--link: var(--shallow);
+		--link-hover: var(--signal);
+		--focus-ring: var(--signal);
+
+		color: var(--fg);
+	}
+
+	.hero__eyebrow {
+		color: var(--fg-muted);
+	}
+
+	.hero__title {
+		margin-block-start: var(--space-2xs);
+	}
+
+	.hero__lede {
+		max-width: 34ch;
+		margin-block-start: var(--space-sm);
+		font-size: var(--text-lg);
+		color: var(--fg-muted);
+	}
+
+	.hero__cta {
+		margin-block-start: var(--space-lg);
+	}
+
+	@media (min-width: 768px) {
+		.hero__lede {
+			max-width: 42ch;
+		}
+	}
+</style>

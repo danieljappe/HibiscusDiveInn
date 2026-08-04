@@ -1,0 +1,160 @@
+---
+/**
+ * One room type. The CTA deep-links to WhatsApp with the room name already
+ * in the message, so the owner knows which room is being asked about.
+ */
+import Photo from './primitives/Photo.astro';
+import Placeholder from './primitives/Placeholder.astro';
+import WhatsAppLink from './WhatsAppLink.astro';
+import { isPlaceholder } from '../lib/placeholders';
+
+interface Props {
+	title: string;
+	capacity: string;
+	summary: string;
+	rate: string;
+	rateNote?: string;
+	features?: string[];
+	image: string;
+	imageAlt: string;
+}
+
+const { title, capacity, summary, rate, rateNote, features = [], image, imageAlt } = Astro.props;
+
+const headingId = `room-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+---
+
+<article class="room" aria-labelledby={headingId}>
+	<div class="room__media">
+		<Photo src={image} alt={imageAlt} sizes="(min-width: 768px) 45vw, 92vw" />
+	</div>
+
+	<div class="room__body">
+		<h3 class="room__title" id={headingId}>{title}</h3>
+
+		<p class="room__capacity">
+			{
+				isPlaceholder(capacity) ? (
+					<Placeholder value={capacity} />
+				) : (
+					<span class="data">{capacity}</span>
+				)
+			}
+		</p>
+
+		<p class="room__summary">{summary}</p>
+
+		{
+			features.length > 0 && (
+				<ul class="room__features">
+					{features.map((feature) => (
+						<li>{feature}</li>
+					))}
+				</ul>
+			)
+		}
+
+		<p class="room__rate">
+			{
+				isPlaceholder(rate) ? (
+					<Placeholder value={rate} />
+				) : (
+					<span class="data room__rate-value">{rate}</span>
+				)
+			}
+			{
+				rateNote &&
+					(isPlaceholder(rateNote) ? (
+						<Placeholder value={rateNote} />
+					) : (
+						<span class="room__rate-note">{rateNote}</span>
+					))
+			}
+		</p>
+
+		<div class="room__cta">
+			<WhatsAppLink channel="inn" context={`the ${title}`} label="Ask about this room" />
+		</div>
+	</div>
+</article>
+
+<style>
+	.room {
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		background-color: var(--bg-raised);
+		border-radius: var(--radius-lg);
+	}
+
+	.room__media :global(img) {
+		width: 100%;
+		aspect-ratio: 4 / 3;
+		object-fit: cover;
+	}
+
+	.room__body {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		gap: var(--space-2xs);
+		padding: var(--space-md);
+	}
+
+	.room__title {
+		font-size: var(--text-xl);
+	}
+
+	.room__capacity {
+		color: var(--fg-muted);
+	}
+
+	.room__summary {
+		margin-block-start: var(--space-3xs);
+		color: var(--fg);
+	}
+
+	.room__features {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2xs) var(--space-sm);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		font-size: var(--text-sm);
+		color: var(--fg-muted);
+	}
+
+	.room__rate {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2xs);
+		align-items: baseline;
+		margin-block-start: auto;
+		padding-block-start: var(--space-sm);
+	}
+
+	.room__rate-value {
+		font-size: var(--text-lg);
+		font-weight: var(--weight-medium);
+	}
+
+	.room__rate-note {
+		font-size: var(--text-sm);
+		color: var(--fg-muted);
+	}
+
+	.room__cta {
+		margin-block-start: var(--space-sm);
+	}
+
+	.room__cta :global(a) {
+		width: 100%;
+	}
+
+	@media (min-width: 768px) {
+		.room__cta :global(a) {
+			width: auto;
+		}
+	}
+</style>

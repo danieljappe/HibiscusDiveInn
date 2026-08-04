@@ -58,11 +58,27 @@ export const ANALYTICS = {
 	cloudflareToken: 'TODO_CLOUDFLARE_ANALYTICS_TOKEN',
 } as const;
 
-/** Default enquiry template, per the brief. */
-export const ENQUIRY_TEMPLATE = [
-	`Hi ${SITE.name}! I'd like to ask about a stay.`,
-	'',
-	'Dates:',
-	'Guests:',
-	'Diving: certified / not certified / want to learn',
-].join('\n');
+/**
+ * Prefilled enquiry templates.
+ *
+ * The whole point is that the owner receives a structured enquiry rather than
+ * "hi is it free?". `inn` is the default from the brief; `dive` is its
+ * equivalent for the dive centre's line.
+ */
+export const ENQUIRY_TEMPLATES = {
+	inn: [
+		`Hi ${SITE.name}! I'd like to ask about a stay.`,
+		'',
+		'Dates:',
+		'Guests:',
+		'Diving: certified / not certified / want to learn',
+	].join('\n'),
+
+	dive: [
+		`Hi ${SITE.name}! I'd like to ask about diving.`,
+		'',
+		'Dates:',
+		'Divers:',
+		'Experience: certified / not certified / want to learn',
+	].join('\n'),
+} as const satisfies Record<ContactChannel, string>;

@@ -1,0 +1,88 @@
+---
+/**
+ * -12m. The transition into the dark half of the site starts here: this
+ * section runs the deep theme on an otherwise sand-coloured page, so scrolling
+ * into it reads as descending.
+ */
+import { getEntry, render } from 'astro:content';
+import Photo from '../../primitives/Photo.astro';
+
+const entry = await getEntry('pages', 'diving-teaser');
+if (!entry) throw new Error('Missing src/content/pages/diving-teaser.md');
+const { Content } = await render(entry);
+---
+
+<section class="section teaser" id="diving" data-theme="deep" aria-labelledby="teaser-heading">
+	<div class="container teaser__inner">
+		<div class="teaser__copy">
+			<p class="eyebrow">Diving</p>
+			<h2 id="teaser-heading">{entry.data.title}</h2>
+			<div class="prose teaser__body">
+				<Content />
+			</div>
+			<p class="teaser__more">
+				<a class="teaser__link" href="/diving">
+					Dive sites, courses and the instructor
+					<span aria-hidden="true">&rarr;</span>
+				</a>
+			</p>
+		</div>
+
+		{
+			entry.data.image && (
+				<div class="teaser__media">
+					<Photo
+						src={entry.data.image}
+						alt={entry.data.imageAlt ?? ''}
+						sizes="(min-width: 768px) 45vw, 92vw"
+					/>
+				</div>
+			)
+		}
+	</div>
+</section>
+
+<style>
+	.teaser {
+		padding-inline-start: var(--rail-width);
+		background-color: var(--bg);
+		color: var(--fg);
+	}
+
+	.teaser__inner {
+		display: grid;
+		gap: var(--space-lg);
+		align-items: center;
+	}
+
+	.teaser__body {
+		margin-block-start: var(--space-md);
+		color: var(--fg-muted);
+	}
+
+	.teaser__more {
+		margin-block-start: var(--space-md);
+	}
+
+	.teaser__link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5em;
+		min-height: 44px;
+		font-weight: var(--weight-medium);
+	}
+
+	.teaser__media :global(img) {
+		width: 100%;
+		aspect-ratio: 8 / 5;
+		object-fit: cover;
+		border-radius: var(--radius-lg);
+	}
+
+	@media (min-width: 768px) {
+		.teaser__inner {
+			grid-template-columns: 1fr 1fr;
+			gap: var(--space-xl);
+		}
+	}
+</style>

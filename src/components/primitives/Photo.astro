@@ -1,0 +1,58 @@
+---
+/**
+ * A photograph from src/assets/images, resolved by filename from the manifest.
+ *
+ * Content files reference photos by name ("room-garden.jpg") rather than by
+ * import, so the owner can swap a photo without touching a component. The
+ * images are currently solid-colour stand-ins at the correct dimensions —
+ * astro:assets treats them exactly as it will treat the real thing.
+ */
+import { Image } from 'astro:assets';
+import { imageSpec } from '../../config/images';
+
+interface Props {
+	/** Filename, e.g. "hero-house-reef.jpg". Must exist in IMAGE_MANIFEST. */
+	src: string;
+	alt: string;
+	/** Rendered width; height follows the manifest's aspect ratio. */
+	width?: number;
+	sizes?: string;
+	/** Above-the-fold images load eagerly and are fetch-priority high. */
+	priority?: boolean;
+	class?: string;
+}
+
+const { src, alt, width, sizes, priority = false, class: className } = Astro.props;
+
+const spec = imageSpec(src);
+
+/* Vite needs a statically analysable glob to resolve runtime filenames. */
+const images = import.meta.glob<{ default: ImageMetadata }>('../../assets/images/*.{jpg,png,webp}');
+const loader = images[`../../assets/images/${src}`];
+
+if (!loader) {
+	throw new Error(
+		`Image "${src}" is in the manifest but missing from src/assets/images. ` +
+			`Run "npm run images:placeholders" to generate a stand-in.`,
+	);
+}
+
+const { default: image } = await loader();
+
+const renderWidth = width ?? spec.width;
+const renderHeight = Math.round(renderWidth * (spec.height / spec.width));
+---
+
+<Image
+	class={className}
+	src={image}
+	alt={alt}
+	width={renderWidth}
+	height={renderHeight}
+	sizes={sizes}
+	widths={[480, 800, 1200, 1600, renderWidth].filter((w) => w <= renderWidth)}
+	loading={priority ? 'eager' : 'lazy'}
+	decoding={priority ? 'sync' : 'async'}
+	fetchpriority={priority ? 'high' : 'auto'}
+	format="avif"
+/>

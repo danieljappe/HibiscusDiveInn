@@ -1,0 +1,102 @@
+---
+import Placeholder from './primitives/Placeholder.astro';
+import { SITE, CONTACT } from '../config/site';
+import { isPlaceholder } from '../lib/placeholders';
+
+interface Props {
+	/**
+	 * The footer sits below the deepest section on both pages, so it stays
+	 * dark — reverting to sand here would undo the descent.
+	 */
+	theme?: 'surface' | 'deep';
+}
+
+const { theme = 'deep' } = Astro.props;
+
+const year = new Date().getFullYear();
+
+const socials = [
+	{ label: 'Facebook', url: CONTACT.facebook },
+	{ label: 'Instagram', url: CONTACT.instagram },
+];
+---
+
+<footer class="site-footer" data-theme={theme}>
+	<div class="container site-footer__inner">
+		<p class="site-footer__name">{SITE.name}</p>
+
+		<p class="site-footer__place">
+			{isPlaceholder(CONTACT.address) ? <Placeholder value={CONTACT.address} /> : CONTACT.address}
+		</p>
+
+		<ul class="site-footer__socials">
+			{
+				socials.map((social) => (
+					<li>
+						{isPlaceholder(social.url) ? (
+							<>
+								<span class="site-footer__social-label">{social.label}</span>{' '}
+								<Placeholder value={social.url} />
+							</>
+						) : (
+							<a href={social.url} rel="me noopener" target="_blank">
+								{social.label}
+							</a>
+						)}
+					</li>
+				))
+			}
+		</ul>
+
+		<p class="site-footer__legal">&copy; {year} {SITE.name}</p>
+	</div>
+</footer>
+
+<style>
+	.site-footer {
+		padding-block: var(--space-xl) var(--space-lg);
+		padding-inline-start: var(--rail-width);
+		border-block-start: 1px solid var(--rule);
+		background-color: var(--bg);
+		font-size: var(--text-sm);
+		color: var(--fg-muted);
+	}
+
+	.site-footer__inner {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2xs);
+	}
+
+	.site-footer__name {
+		font-family: var(--font-display);
+		font-size: var(--text-lg);
+		font-weight: var(--weight-semibold);
+		letter-spacing: var(--tracking-display-loose);
+		color: var(--fg);
+	}
+
+	.site-footer__socials {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-sm);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.site-footer__socials a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+	}
+
+	.site-footer__social-label {
+		color: var(--fg);
+	}
+
+	.site-footer__legal {
+		margin-block-start: var(--space-sm);
+		font-size: var(--text-xs);
+	}
+</style>

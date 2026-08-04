@@ -1,0 +1,42 @@
+---
+/**
+ * -2m. Two or three short paragraphs, plainly written. All copy comes from
+ * src/content/pages/about.md.
+ */
+import { getEntry, render } from 'astro:content';
+
+const entry = await getEntry('pages', 'about');
+if (!entry) throw new Error('Missing src/content/pages/about.md');
+const { Content } = await render(entry);
+---
+
+<section class="section about" id="about" aria-labelledby="about-heading">
+	<div class="container">
+		<p class="eyebrow">About</p>
+		<h2 id="about-heading" class="about__heading">{entry.data.title}</h2>
+		<div class="prose about__body">
+			<Content />
+		</div>
+	</div>
+</section>
+
+<style>
+	.about {
+		padding-inline-start: var(--rail-width);
+	}
+
+	.about__heading {
+		max-width: 20ch;
+		margin-block-start: var(--space-2xs);
+	}
+
+	.about__body {
+		margin-block-start: var(--space-md);
+	}
+
+	@media (min-width: 768px) {
+		.about__heading {
+			max-width: 24ch;
+		}
+	}
+</style>

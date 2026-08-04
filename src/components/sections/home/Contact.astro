@@ -1,0 +1,156 @@
+---
+/**
+ * -30m, the deepest point of the homepage. WhatsApp primary, email secondary,
+ * map link, socials in the footer below.
+ */
+import WhatsAppLink from '../../WhatsAppLink.astro';
+import Placeholder from '../../primitives/Placeholder.astro';
+import { CONTACT, CHANNELS } from '../../../config/site';
+import { formatPhone, telHref } from '../../../lib/phone';
+import { isPlaceholder } from '../../../lib/placeholders';
+---
+
+<section class="section contact" id="contact" data-theme="deep" aria-labelledby="contact-heading">
+	<div class="container contact__inner">
+		<div class="contact__lead">
+			<p class="eyebrow">Contact</p>
+			<h2 id="contact-heading">Ask us anything</h2>
+			<p class="contact__lede prose">
+				WhatsApp is the fastest way to reach us. Tell us your dates and whether you dive, and we
+				will come back to you with what is available.
+			</p>
+
+			{
+				/* The list alongside carries the phone and email fallbacks, so the
+			    CTA here is the WhatsApp link alone rather than the full trio. */
+			}
+			<div class="contact__cta">
+				<WhatsAppLink channel="inn" label="Ask about a stay" />
+			</div>
+		</div>
+
+		<div class="contact__details">
+			<dl class="contact__list">
+				<div class="contact__item">
+					<dt>The inn</dt>
+					<dd>
+						<a class="data" href={telHref(CHANNELS.inn.number)}>
+							{formatPhone(CHANNELS.inn.number)}
+						</a>
+						<span class="contact__hint">Rooms and general enquiries</span>
+					</dd>
+				</div>
+
+				<div class="contact__item">
+					<dt>The dive centre</dt>
+					<dd>
+						<a class="data" href={telHref(CHANNELS.dive.number)}>
+							{formatPhone(CHANNELS.dive.number)}
+						</a>
+						<span class="contact__hint">Courses and dive enquiries</span>
+					</dd>
+				</div>
+
+				<div class="contact__item">
+					<dt>Email</dt>
+					<dd>
+						{
+							isPlaceholder(CONTACT.email) ? (
+								<Placeholder value={CONTACT.email} />
+							) : (
+								<a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
+							)
+						}
+					</dd>
+				</div>
+
+				<div class="contact__item">
+					<dt>Where we are</dt>
+					<dd>
+						{
+							isPlaceholder(CONTACT.address) ? (
+								<Placeholder value={CONTACT.address} />
+							) : (
+								<span>{CONTACT.address}</span>
+							)
+						}
+						{
+							isPlaceholder(CONTACT.mapsUrl) ? (
+								<Placeholder value={CONTACT.mapsUrl} />
+							) : (
+								<a href={CONTACT.mapsUrl} rel="noopener" target="_blank">
+									Open in Maps
+								</a>
+							)
+						}
+					</dd>
+				</div>
+			</dl>
+		</div>
+	</div>
+</section>
+
+<style>
+	.contact {
+		padding-inline-start: var(--rail-width);
+		background-color: var(--bg);
+		color: var(--fg);
+	}
+
+	.contact__inner {
+		display: grid;
+		gap: var(--space-xl);
+	}
+
+	.contact__lede {
+		margin-block-start: var(--space-sm);
+		color: var(--fg-muted);
+	}
+
+	.contact__cta {
+		margin-block-start: var(--space-lg);
+	}
+
+	.contact__list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-md);
+		margin: 0;
+	}
+
+	.contact__item dt {
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-caps);
+		color: var(--fg-muted);
+	}
+
+	.contact__item dd {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3xs);
+		align-items: flex-start;
+		margin: 0;
+		margin-block-start: var(--space-3xs);
+	}
+
+	.contact__item a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+		font-weight: var(--weight-medium);
+	}
+
+	.contact__hint {
+		font-size: var(--text-sm);
+		color: var(--fg-muted);
+	}
+
+	@media (min-width: 768px) {
+		.contact__inner {
+			grid-template-columns: 1.1fr 0.9fr;
+			gap: var(--space-2xl);
+		}
+	}
+</style>
