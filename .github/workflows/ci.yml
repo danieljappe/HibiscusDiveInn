@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Formatting
+        run: npm run format:check
+
+      - name: Types and content schemas
+        run: npm run check
+
+      - name: Colour contrast
+        run: npm run check:contrast
+
+      # No ALLOW_PLACEHOLDERS here on purpose: this step must fail while any
+      # TODO_ value remains, so nothing placeholder-shaped can reach the site.
+      - name: Build
+        run: npm run build

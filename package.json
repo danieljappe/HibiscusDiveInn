@@ -1,0 +1,35 @@
+{
+  "name": "hibiscus-dive-inn",
+  "type": "module",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check": "astro check",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "placeholders": "node scripts/report-placeholders.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "build:preview": "ALLOW_PLACEHOLDERS=1 astro build"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/instrument-sans": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "astro": "^7.1.6"
+  },
+  "description": "Static marketing site for Hibiscus Dive Inn, Bantayan Island, Cebu",
+  "private": true,
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "prettier": "^3.9.6",
+    "prettier-plugin-astro": "^0.14.1",
+    "typescript": "^6.0.3"
+  }
+}

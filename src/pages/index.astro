@@ -1,0 +1,16 @@
+---
+/**
+ * Scaffold placeholder. The real homepage — hero, about, rooms, diving teaser,
+ * getting here, contact — is built in the next stage.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../config/site';
+---
+
+<BaseLayout title={SITE.name} description={SITE.description} theme="surface">
+	<div class="container section">
+		<p class="eyebrow">{SITE.place.island}, {SITE.place.province}</p>
+		<h1>{SITE.name}</h1>
+		<p class="prose">{SITE.tagline}</p>
+	</div>
+</BaseLayout>

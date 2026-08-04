@@ -1,0 +1,64 @@
+---
+/**
+ * Renders an unconfirmed value.
+ *
+ * In development a `TODO_` value shows as a loud inline badge so nothing
+ * placeholder-shaped can be mistaken for real copy. In a production build the
+ * placeholder guard has already refused to build, so this only ever renders
+ * the real value there.
+ */
+import { isPlaceholder, humanisePlaceholder } from '../../lib/placeholders';
+
+interface Props {
+	/** The value, which may or may not still be a placeholder. */
+	value: string;
+	/** Optional label shown before the value when it is real. */
+	prefix?: string;
+	/** Render in mono, for data like depths and prices. */
+	data?: boolean;
+}
+
+const { value, prefix, data = false } = Astro.props;
+const pending = isPlaceholder(value);
+---
+
+{
+	pending ? (
+		<span class="placeholder" data-placeholder={value} title={`Unconfirmed: ${value}`}>
+			<span class="placeholder__mark" aria-hidden="true">
+				?
+			</span>
+			<span class="placeholder__text">{humanisePlaceholder(value)}</span>
+			<span class="visually-hidden">— not yet confirmed with the owner</span>
+		</span>
+	) : (
+		<span class={data ? 'data' : undefined}>
+			{prefix}
+			{value}
+		</span>
+	)
+}
+
+<style>
+	.placeholder {
+		display: inline-flex;
+		gap: 0.35em;
+		align-items: baseline;
+		padding: 0.15em 0.5em;
+		border: 1px dashed currentColor;
+		border-radius: var(--radius-sm);
+		font-family: var(--font-mono);
+		font-size: 0.85em;
+		letter-spacing: var(--tracking-mono);
+		color: var(--fg-muted);
+		background-color: color-mix(in srgb, var(--signal) 18%, transparent);
+	}
+
+	.placeholder__mark {
+		font-weight: var(--weight-bold);
+	}
+
+	.placeholder__text::first-letter {
+		text-transform: uppercase;
+	}
+</style>

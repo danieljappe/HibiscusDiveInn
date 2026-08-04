@@ -1,0 +1,110 @@
+---
+/**
+ * The document shell for both pages.
+ *
+ * `theme` chooses which end of the depth scale the page sits at: `surface` for
+ * the homepage, `deep` for /diving. Everything else — palette, rail colours,
+ * focus ring — follows from that one attribute.
+ */
+import { SITE, ANALYTICS } from '../config/site';
+import { isPlaceholder } from '../lib/placeholders';
+
+import '../styles/fonts.css';
+import '../styles/tokens.css';
+import '../styles/base.css';
+
+import displayFont from '../assets/fonts/bricolage-grotesque-latin-wght-normal.woff2';
+import bodyFont from '../assets/fonts/instrument-sans-latin-wght-normal.woff2';
+
+interface Props {
+	title: string;
+	description: string;
+	theme?: 'surface' | 'deep';
+	/** Path of the OG image in /public, absolute from the site root. */
+	ogImage?: string;
+	/** Structured data objects, serialised into ld+json. */
+	jsonLd?: Record<string, unknown>[];
+}
+
+const {
+	title,
+	description,
+	theme = 'surface',
+	ogImage = '/og-default.png',
+	jsonLd = [],
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImageUrl = new URL(ogImage, Astro.site).href;
+const fullTitle = title === SITE.name ? title : `${title} — ${SITE.name}`;
+
+/*
+ * Cloudflare Web Analytics is cookieless, so the site needs no consent banner.
+ * Until a real token is set the script is omitted entirely, which keeps the
+ * production bundle at zero third-party JavaScript.
+ */
+const analyticsToken = isPlaceholder(ANALYTICS.cloudflareToken) ? null : ANALYTICS.cloudflareToken;
+---
+
+<!doctype html>
+<html lang={SITE.locale} data-theme={theme}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<title>{fullTitle}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+
+		<!-- Fonts are same-origin and fingerprinted; the two above the fold are preloaded. -->
+		<link rel="preload" href={displayFont} as="font" type="font/woff2" crossorigin />
+		<link rel="preload" href={bodyFont} as="font" type="font/woff2" crossorigin />
+
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content={SITE.name} />
+		<meta property="og:title" content={fullTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={ogImageUrl} />
+		<meta property="og:locale" content="en_PH" />
+
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={fullTitle} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImageUrl} />
+
+		<!-- Geo-targeting: divers find this resort through search. -->
+		<meta name="geo.region" content={`${SITE.region}-CEB`} />
+		<meta name="geo.placename" content={`${SITE.place.island}, ${SITE.place.province}`} />
+
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="sitemap" href="/sitemap-index.xml" />
+
+		{
+			jsonLd.map((schema) => (
+				<script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
+			))
+		}
+
+		{
+			analyticsToken && (
+				<script
+					is:inline
+					defer
+					src="https://static.cloudflareinsights.com/beacon.min.js"
+					data-cf-beacon={`{"token": "${analyticsToken}"}`}
+				/>
+			)
+		}
+	</head>
+
+	<body>
+		<a class="skip-link" href="#main">Skip to content</a>
+		<slot name="rail" />
+		<slot name="header" />
+		<main id="main">
+			<slot />
+		</main>
+		<slot name="footer" />
+	</body>
+</html>

@@ -1,0 +1,9 @@
+dist/
+.astro/
+node_modules/
+package-lock.json
+src/assets/fonts/
+public/
+
+# The build brief is the source of truth — leave its formatting alone.
+CLAUDE.md
