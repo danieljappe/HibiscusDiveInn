@@ -10,7 +10,8 @@ import { isPlaceholder } from '../lib/placeholders';
 
 interface Props {
 	title: string;
-	capacity: string;
+	/** How many people the room sleeps. */
+	sleeps: number;
 	summary: string;
 	rate: string;
 	rateNote?: string;
@@ -19,7 +20,7 @@ interface Props {
 	imageAlt: string;
 }
 
-const { title, capacity, summary, rate, rateNote, features = [], image, imageAlt } = Astro.props;
+const { title, sleeps, summary, rate, rateNote, features = [], image, imageAlt } = Astro.props;
 
 const headingId = `room-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 ---
@@ -33,13 +34,7 @@ const headingId = `room-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 		<h3 class="room__title" id={headingId}>{title}</h3>
 
 		<p class="room__capacity">
-			{
-				isPlaceholder(capacity) ? (
-					<Placeholder value={capacity} />
-				) : (
-					<span class="data">{capacity}</span>
-				)
-			}
+			<span class="data">Sleeps {sleeps}</span>
 		</p>
 
 		<p class="room__summary">{summary}</p>

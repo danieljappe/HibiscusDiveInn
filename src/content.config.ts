@@ -25,8 +25,8 @@ const rooms = defineCollection({
 		title: z.string(),
 		/** Display order in the rooms section. Lower is first. */
 		order: z.number().int(),
-		/** How many the room sleeps, e.g. "Sleeps 2". Unconfirmed. */
-		capacity: unconfirmed,
+		/** How many people the room sleeps. Confirmed: rooms are 1, 2 and 4 person. */
+		sleeps: z.number().int().positive(),
 		/** One or two sentences on the card. */
 		summary: z.string().max(240),
 		/** Indicative nightly rate. Placeholder until the owner confirms. */

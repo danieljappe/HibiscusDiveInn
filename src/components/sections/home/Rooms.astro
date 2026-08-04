@@ -26,7 +26,7 @@ const rooms = (await getCollection('rooms', ({ data }) => !data.draft)).sort(
 					<li>
 						<RoomCard
 							title={room.data.title}
-							capacity={room.data.capacity}
+							sleeps={room.data.sleeps}
 							summary={room.data.summary}
 							rate={room.data.rate}
 							rateNote={room.data.rateNote}
