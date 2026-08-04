@@ -1,4 +1,4 @@
-import { defineCollection } from 'astro:content';
+import { defineCollection, reference } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
@@ -69,8 +69,11 @@ const courses = defineCollection({
 	schema: z.object({
 		title: z.string(),
 		order: z.number().int(),
-		/** Certifying agency. Unconfirmed — do not assume PADI or SSI. */
-		agency: unconfirmed,
+		/**
+		 * Certifying agency. Unconfirmed — do not assume PADI or SSI.
+		 * Omitted for entries that certify nothing, such as a fun dive.
+		 */
+		agency: unconfirmed.optional(),
 		/** e.g. "3-4 days". Unconfirmed. */
 		duration: unconfirmed,
 		/** Indicative price. Unconfirmed. */
@@ -84,6 +87,12 @@ const courses = defineCollection({
 		 * a try dive is not a course.
 		 */
 		enquiryLabel: z.string().optional(),
+		/**
+		 * The course this one continues from, by id. Renders attached to its
+		 * parent with a connector, so the progression from one certification to
+		 * the next is visible rather than implied by ordering.
+		 */
+		followsFrom: reference('courses').optional(),
 		prerequisites: z.string().optional(),
 		includes: z.array(z.string()).default([]),
 		draft: z.boolean().default(false),

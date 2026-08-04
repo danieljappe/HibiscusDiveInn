@@ -10,7 +10,9 @@ import { isPlaceholder } from '../lib/placeholders';
 
 interface Props {
 	title: string;
-	agency: string;
+	agency?: string;
+	/** Title of the course this one continues from, if any. */
+	followsFromTitle?: string;
 	duration: string;
 	price: string;
 	priceNote?: string;
@@ -24,6 +26,7 @@ interface Props {
 const {
 	title,
 	agency,
+	followsFromTitle,
 	duration,
 	price,
 	priceNote,
@@ -40,10 +43,25 @@ const headingId = `course-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 
 <article class="course" aria-labelledby={headingId}>
 	<div class="course__head">
+		{
+			followsFromTitle && (
+				<p class="course__follows">
+					<span aria-hidden="true">&crarr;</span> Continues from {followsFromTitle}
+				</p>
+			)
+		}
 		<h3 class="course__title" id={headingId}>{title}</h3>
-		<p class="course__agency">
-			{isPlaceholder(agency) ? <Placeholder value={agency} /> : <span class="data">{agency}</span>}
-		</p>
+		{
+			agency && (
+				<p class="course__agency">
+					{isPlaceholder(agency) ? (
+						<Placeholder value={agency} />
+					) : (
+						<span class="data">{agency}</span>
+					)}
+				</p>
+			)
+		}
 	</div>
 
 	<dl class="course__stats">
@@ -93,6 +111,15 @@ const headingId = `course-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 		padding: var(--space-md);
 		background-color: var(--bg-raised);
 		border-radius: var(--radius-lg);
+	}
+
+	.course__follows {
+		margin-block-end: var(--space-2xs);
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-caps);
+		color: var(--fg-muted);
 	}
 
 	.course__title {

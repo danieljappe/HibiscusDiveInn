@@ -1,5 +1,13 @@
 ---
-/** -32m. Courses, each linking to the dive centre's WhatsApp line. */
+/**
+ * -32m. What you can do in the water, ordered deliberately rather than by
+ * difficulty: fun dives first for divers who are already certified, then Open
+ * Water, then Advanced attached to it as the next step, then Discover Scuba
+ * Diving for people who have never dived.
+ *
+ * A course declaring `followsFrom` renders joined to its parent so the
+ * progression between certifications is visible instead of implied by order.
+ */
 import { getCollection, render } from 'astro:content';
 import CourseCard from '../../CourseCard.astro';
 
@@ -10,34 +18,76 @@ const courses = (await getCollection('courses', ({ data }) => !data.draft)).sort
 const rendered = await Promise.all(
 	courses.map(async (course) => ({ course, Content: (await render(course)).Content })),
 );
+
+const byId = new Map(rendered.map((item) => [item.course.id, item]));
+
+/** Entries that start a pathway, each with any courses that continue from it. */
+const pathways = rendered
+	.filter(({ course }) => !course.data.followsFrom)
+	.map((root) => ({
+		root,
+		followers: rendered.filter(({ course }) => course.data.followsFrom?.id === root.course.id),
+	}));
+
+const titleOf = (id: string) => byId.get(id)?.course.data.title;
 ---
 
 <section class="section courses" id="courses" aria-labelledby="courses-heading">
 	<div class="container">
-		<p class="eyebrow">Courses</p>
-		<h2 id="courses-heading">Learning to dive here</h2>
+		<p class="eyebrow">Courses &amp; dives</p>
+		<h2 id="courses-heading">Diving with us</h2>
 		<p class="courses__lede prose">
-			Courses run all year. Because there is one instructor, dates depend on who else is booked —
-			ask early if you are travelling to a fixed schedule.
+			Whether you are already certified or have never breathed underwater, it starts with a message.
+			Because there is one instructor, dates depend on who else is booked — ask early if you are
+			travelling to a fixed schedule.
 		</p>
 
-		<ul class="courses__grid" role="list">
+		<ul class="courses__list" role="list">
 			{
-				rendered.map(({ course, Content }) => (
-					<li>
-						<CourseCard
-							title={course.data.title}
-							agency={course.data.agency}
-							duration={course.data.duration}
-							price={course.data.price}
-							priceNote={course.data.priceNote}
-							suitableFor={course.data.suitableFor}
-							enquiryLabel={course.data.enquiryLabel}
-							prerequisites={course.data.prerequisites}
-							includes={course.data.includes}
-						>
-							<Content />
-						</CourseCard>
+				pathways.map(({ root, followers }) => (
+					<li class:list={['pathway', followers.length > 0 && 'pathway--linked']}>
+						<div class="pathway__card">
+							<CourseCard
+								title={root.course.data.title}
+								agency={root.course.data.agency}
+								duration={root.course.data.duration}
+								price={root.course.data.price}
+								priceNote={root.course.data.priceNote}
+								suitableFor={root.course.data.suitableFor}
+								enquiryLabel={root.course.data.enquiryLabel}
+								prerequisites={root.course.data.prerequisites}
+								includes={root.course.data.includes}
+							>
+								<root.Content />
+							</CourseCard>
+						</div>
+
+						{followers.map((follower) => (
+							<>
+								<div class="pathway__join" aria-hidden="true">
+									<span class="pathway__join-line" />
+									<span class="pathway__join-label">then</span>
+									<span class="pathway__join-line" />
+								</div>
+
+								<div class="pathway__card">
+									<CourseCard
+										title={follower.course.data.title}
+										agency={follower.course.data.agency}
+										followsFromTitle={titleOf(follower.course.data.followsFrom!.id)}
+										duration={follower.course.data.duration}
+										price={follower.course.data.price}
+										priceNote={follower.course.data.priceNote}
+										suitableFor={follower.course.data.suitableFor}
+										enquiryLabel={follower.course.data.enquiryLabel}
+										prerequisites={follower.course.data.prerequisites}
+										includes={follower.course.data.includes}
+									>
+										<follower.Content />
+									</CourseCard>
+								</div>
+							</>
+						))}
 					</li>
 				))
 			}
@@ -56,29 +106,53 @@ const rendered = await Promise.all(
 		color: var(--fg-muted);
 	}
 
-	.courses__grid {
-		display: grid;
-		gap: var(--space-md);
+	.courses__list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-lg);
+		max-width: 48rem;
 		margin: 0;
 		margin-block-start: var(--space-lg);
 		padding: 0;
 		list-style: none;
 	}
 
-	.courses__grid > li {
+	.pathway {
+		display: grid;
+		gap: var(--space-sm);
+	}
+
+	.pathway__card {
 		display: flex;
 	}
 
-	@media (min-width: 768px) {
-		.courses__grid {
-			grid-template-columns: repeat(2, 1fr);
-			gap: var(--space-lg);
-		}
+	.pathway__card > :global(*) {
+		width: 100%;
 	}
 
-	@media (min-width: 1200px) {
-		.courses__grid {
-			grid-template-columns: repeat(3, 1fr);
-		}
+	/*
+	 * The connector between a certification and the one that follows it.
+	 * The pair stays stacked at every width: the progression reads downward,
+	 * which is the direction the rest of the site already moves in.
+	 */
+	.pathway__join {
+		display: flex;
+		gap: var(--space-2xs);
+		align-items: center;
+		justify-content: center;
+	}
+
+	.pathway__join-line {
+		flex: 1;
+		height: 1px;
+		background-color: var(--rule);
+	}
+
+	.pathway__join-label {
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-caps);
+		color: var(--fg-muted);
 	}
 </style>
