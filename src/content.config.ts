@@ -112,6 +112,11 @@ const pages = defineCollection({
 		 * with the owner before launch.
 		 */
 		legs: z.array(journeyLeg).optional(),
+		/**
+		 * getting-here.md only. Departure and crossing times, which change with
+		 * the season and must come from the owner.
+		 */
+		schedules: z.array(z.object({ label: z.string(), value: unconfirmed })).optional(),
 		/** instructor.md only. */
 		certifications: z.array(unconfirmed).optional(),
 		instructorName: z.string().optional(),

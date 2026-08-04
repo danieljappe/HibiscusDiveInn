@@ -1,10 +1,14 @@
 ---
 /**
  * -20m. Bantayan is awkward to reach, and this is otherwise the most common
- * question. Every duration and fare is a placeholder until the owner confirms
- * the route — none of it is invented here.
+ * question. The route is one direct bus that boards the ferry, so this is a
+ * single leg rather than a numbered itinerary.
+ *
+ * Durations, fares and timetables are placeholders until the owner confirms
+ * them. None of it is invented here.
  */
 import { getEntry, render } from 'astro:content';
+import Stat from '../../primitives/Stat.astro';
 import Placeholder from '../../primitives/Placeholder.astro';
 import { isPlaceholder } from '../../../lib/placeholders';
 
@@ -13,6 +17,7 @@ if (!entry) throw new Error('Missing src/content/pages/getting-here.md');
 const { Content } = await render(entry);
 
 const legs = entry.data.legs ?? [];
+const schedules = entry.data.schedules ?? [];
 ---
 
 <section class="section journey" id="getting-here" aria-labelledby="journey-heading">
@@ -22,59 +27,39 @@ const legs = entry.data.legs ?? [];
 
 		{entry.data.intro && <p class="journey__intro prose">{entry.data.intro}</p>}
 
-		<ol class="journey__legs">
-			{
-				legs.map((leg, index) => (
-					<li class="leg">
-						<span class="leg__index data" aria-hidden="true">
-							{String(index + 1).padStart(2, '0')}
+		{
+			legs.map((leg) => (
+				<div class="route">
+					<p class="route__places">
+						<span>{leg.from}</span>
+						<span class="route__arrow" aria-hidden="true">
+							&rarr;
 						</span>
+						<span class="visually-hidden">to</span>
+						<span>{leg.to}</span>
+					</p>
 
-						<div class="leg__detail">
-							<p class="leg__route">
-								<span class="leg__mode data">{leg.mode}</span>
-								<span class="leg__places">
-									{leg.from} <span aria-hidden="true">&rarr;</span>{' '}
-									<span class="visually-hidden">to</span> {leg.to}
-								</span>
+					<p class="route__mode data">{leg.mode}</p>
+
+					<dl class="route__stats">
+						<Stat label="Journey time" value={leg.duration} emphasis />
+						<Stat label="Fare" value={leg.cost} emphasis />
+						{schedules.map((schedule) => (
+							<Stat label={schedule.label} value={schedule.value} />
+						))}
+					</dl>
+
+					{leg.note &&
+						(isPlaceholder(leg.note) ? (
+							<p class="route__note">
+								<Placeholder value={leg.note} />
 							</p>
-
-							<dl class="leg__stats">
-								<div class="leg__stat">
-									<dt>Duration</dt>
-									<dd>
-										{isPlaceholder(leg.duration) ? (
-											<Placeholder value={leg.duration} />
-										) : (
-											<span class="data">{leg.duration}</span>
-										)}
-									</dd>
-								</div>
-								<div class="leg__stat">
-									<dt>Cost</dt>
-									<dd>
-										{isPlaceholder(leg.cost) ? (
-											<Placeholder value={leg.cost} />
-										) : (
-											<span class="data">{leg.cost}</span>
-										)}
-									</dd>
-								</div>
-							</dl>
-
-							{leg.note &&
-								(isPlaceholder(leg.note) ? (
-									<p class="leg__note">
-										<Placeholder value={leg.note} />
-									</p>
-								) : (
-									<p class="leg__note">{leg.note}</p>
-								))}
-						</div>
-					</li>
-				))
-			}
-		</ol>
+						) : (
+							<p class="route__note">{leg.note}</p>
+						))}
+				</div>
+			))
+		}
 
 		<div class="prose journey__body">
 			<Content />
@@ -92,76 +77,50 @@ const legs = entry.data.legs ?? [];
 		color: var(--fg-muted);
 	}
 
-	.journey__legs {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-sm);
-		margin: 0;
+	.route {
+		max-width: 56rem;
 		margin-block-start: var(--space-lg);
-		padding: 0;
-		list-style: none;
-		counter-reset: leg;
-	}
-
-	.leg {
-		display: flex;
-		gap: var(--space-sm);
 		padding: var(--space-md);
 		background-color: var(--bg-raised);
-		border-radius: var(--radius-md);
+		border-radius: var(--radius-lg);
 	}
 
-	.leg__index {
-		flex: none;
-		color: var(--fg-muted);
-		font-size: var(--text-sm);
-		padding-block-start: 0.15em;
-	}
-
-	.leg__detail {
-		flex: 1;
-	}
-
-	.leg__route {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-3xs);
-	}
-
-	.leg__mode {
-		font-size: var(--text-xs);
-		text-transform: uppercase;
-		letter-spacing: var(--tracking-caps);
-		color: var(--fg-muted);
-	}
-
-	.leg__places {
-		font-weight: var(--weight-medium);
-	}
-
-	.leg__stats {
+	.route__places {
 		display: flex;
 		flex-wrap: wrap;
-		gap: var(--space-sm) var(--space-lg);
-		margin: 0;
-		margin-block-start: var(--space-xs);
+		gap: var(--space-2xs) var(--space-sm);
+		align-items: baseline;
+		font-family: var(--font-display);
+		font-size: var(--text-xl);
+		font-weight: var(--weight-semibold);
+		letter-spacing: var(--tracking-display-loose);
+		line-height: var(--leading-snug);
 	}
 
-	.leg__stat dt {
-		font-size: var(--text-xs);
-		text-transform: uppercase;
-		letter-spacing: var(--tracking-caps);
-		font-family: var(--font-mono);
+	.route__arrow {
 		color: var(--fg-muted);
 	}
 
-	.leg__stat dd {
-		margin: 0;
+	.route__mode {
 		margin-block-start: var(--space-3xs);
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-caps);
+		color: var(--fg-muted);
 	}
 
-	.leg__note {
-		margin-block-start: var(--space-xs);
+	.route__stats {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-md) var(--space-xl);
+		margin: 0;
+		margin-block-start: var(--space-md);
+		padding-block-start: var(--space-md);
+		border-block-start: 1px solid var(--rule);
+	}
+
+	.route__note {
+		margin-block-start: var(--space-md);
 		font-size: var(--text-sm);
 		color: var(--fg-muted);
 	}
@@ -171,18 +130,8 @@ const legs = entry.data.legs ?? [];
 	}
 
 	@media (min-width: 768px) {
-		.leg {
-			padding: var(--space-md) var(--space-lg);
-		}
-
-		.leg__route {
-			flex-direction: row;
-			align-items: baseline;
-			gap: var(--space-sm);
-		}
-
-		.leg__mode {
-			min-width: 5rem;
+		.route {
+			padding: var(--space-lg);
 		}
 	}
 </style>
