@@ -7,6 +7,7 @@
  * focus ring — follows from that one attribute.
  */
 import { SITE, ANALYTICS } from '../config/site';
+import { IS_PREVIEW } from '../config/preview';
 import { isPlaceholder } from '../lib/placeholders';
 
 import '../styles/fonts.css';
@@ -55,6 +56,9 @@ const analyticsToken = isPlaceholder(ANALYTICS.cloudflareToken) ? null : ANALYTI
 		<title>{fullTitle}</title>
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonical} />
+
+		{/* Preview builds carry placeholder copy and must never be indexed. */}
+		{IS_PREVIEW && <meta name="robots" content="noindex, nofollow" />}
 
 		<!-- Fonts are same-origin and fingerprinted; the two above the fold are preloaded. -->
 		<link rel="preload" href={displayFont} as="font" type="font/woff2" crossorigin />

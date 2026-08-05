@@ -15,7 +15,7 @@
     "placeholders": "node scripts/report-placeholders.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "build:preview": "ALLOW_PLACEHOLDERS=1 astro build",
+    "build:preview": "PREVIEW=true astro build",
     "images:placeholders": "node scripts/make-placeholder-images.mjs",
     "images:og": "node scripts/make-og-images.mjs",
     "build:audit": "ALLOW_PLACEHOLDERS=1 PREVIEW_SITE=http://localhost:4322 astro build"

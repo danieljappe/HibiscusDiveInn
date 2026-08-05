@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import type { AstroIntegration } from 'astro';
 
 import { PLACEHOLDER_PATTERN } from '../lib/placeholders.ts';
+import { IS_PREVIEW, PREVIEW_BANNER } from '../config/preview.ts';
 
 /**
  * Fails a production build while any `TODO_` placeholder remains, and warns
@@ -13,9 +14,17 @@ import { PLACEHOLDER_PATTERN } from '../lib/placeholders.ts';
  * catches placeholders inside content frontmatter and inside prose — travel
  * times, fares, rates and prices all live there.
  *
- * Escape hatch: set ALLOW_PLACEHOLDERS=1 to build anyway. This exists so a
- * preview build can be produced for Lighthouse before the owner has supplied
- * real figures. Neither CI nor Cloudflare Pages sets it.
+ * Two flags relax it, and they are not interchangeable:
+ *
+ *   PREVIEW=true          Warn and continue. For a client preview that will be
+ *                         deployed — so it also makes the build noindex and
+ *                         drops the sitemap. See src/config/preview.ts.
+ *   ALLOW_PLACEHOLDERS=1  Warn and continue, but leave the output indexable
+ *                         and identical to production otherwise. For local
+ *                         Lighthouse runs only, where a noindex would
+ *                         invalidate the SEO score. Never deploy it.
+ *
+ * Neither is set by CI or by the production deployment.
  */
 
 /** Directories scanned, relative to the project root. */
@@ -94,10 +103,29 @@ export default function placeholderGuard(): AstroIntegration {
 					findings.length === 1 ? '' : 's'
 				}`;
 
+				/*
+				 * Preview mode: warn and carry on, so the client can be shown the
+				 * site before the owner has supplied the missing details. The
+				 * badges still render — the client seeing "? address" is the
+				 * point. The same flag makes the build noindex and drops the
+				 * sitemap, so this leniency cannot be had without them.
+				 */
+				if (IS_PREVIEW) {
+					logger.warn(`${PREVIEW_BANNER}\n\n` + `${summary} still unset:\n${format(findings)}`);
+					return;
+				}
+
+				/*
+				 * Build despite placeholders but otherwise identical to
+				 * production — indexable, with a sitemap. This exists for local
+				 * Lighthouse runs, where preview mode's noindex would invalidate
+				 * the SEO score. Not for deploying.
+				 */
 				if (process.env.ALLOW_PLACEHOLDERS === '1') {
 					logger.warn(
 						`Building with ${summary} because ALLOW_PLACEHOLDERS=1.\n` +
-							`This output must not be deployed.\n${format(findings)}`,
+							`This output is indexable and must not be deployed. For a preview\n` +
+							`someone will actually visit, use PREVIEW=true instead.\n${format(findings)}`,
 					);
 					return;
 				}
@@ -105,8 +133,9 @@ export default function placeholderGuard(): AstroIntegration {
 				throw new Error(
 					`Refusing to build: ${summary} still in the source.\n\n` +
 						`${format(findings)}\n\n` +
-						`Fill these in (most live in src/config/site.ts and src/content/), or set\n` +
-						`ALLOW_PLACEHOLDERS=1 to produce a preview build that must not be deployed.`,
+						`Fill these in (most live in src/config/site.ts and src/content/), or\n` +
+						`set PREVIEW=true to deploy a noindexed client preview that keeps the\n` +
+						`placeholder badges visible.`,
 				);
 			},
 

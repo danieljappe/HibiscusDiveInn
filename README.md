@@ -19,18 +19,18 @@ npm install
 npm run dev        # http://localhost:4321
 ```
 
-| Command                       | What it does                                          |
-| ----------------------------- | ----------------------------------------------------- |
-| `npm run dev`                 | Development server, with placeholder warnings         |
-| `npm run build`               | Production build. **Fails** while any `TODO_` remains |
-| `npm run build:preview`       | Build anyway, placeholders and all. Never deploy this |
-| `npm run preview`             | Serve the last build locally                          |
-| `npm run check`               | Type-check components and validate content files      |
-| `npm run check:contrast`      | Verify every colour pairing against WCAG AA           |
-| `npm run placeholders`        | List every value still to confirm with the owner      |
-| `npm run images:placeholders` | Create stand-in photos for anything missing           |
-| `npm run images:og`           | Create the social sharing cards                       |
-| `npm run format`              | Format everything with Prettier                       |
+| Command                       | What it does                                           |
+| ----------------------------- | ------------------------------------------------------ |
+| `npm run dev`                 | Development server, with placeholder warnings          |
+| `npm run build`               | Production build. **Fails** while any `TODO_` remains  |
+| `npm run build:preview`       | Client preview build — noindexed, placeholders allowed |
+| `npm run preview`             | Serve the last build locally                           |
+| `npm run check`               | Type-check components and validate content files       |
+| `npm run check:contrast`      | Verify every colour pairing against WCAG AA            |
+| `npm run placeholders`        | List every value still to confirm with the owner       |
+| `npm run images:placeholders` | Create stand-in photos for anything missing            |
+| `npm run images:og`           | Create the social sharing cards                        |
+| `npm run format`              | Format everything with Prettier                        |
 
 Astro 7 runs the dev server as a background daemon. `npx astro dev stop` stops it,
 and `npx astro dev logs` shows its output.
@@ -59,6 +59,45 @@ what is outstanding.
 
 ---
 
+## Deploying a preview
+
+The client can be shown the site before the owner has supplied the outstanding
+details. Set `PREVIEW=true` and the build succeeds with the placeholders still
+in place, warning about each one instead of refusing.
+
+```bash
+npm run build:preview                          # PREVIEW=true astro build
+npx wrangler pages deploy dist --project-name=hibiscus-dive-inn
+```
+
+`PREVIEW=true` does four things together:
+
+- the placeholder guard warns instead of failing
+- `<meta name="robots" content="noindex, nofollow">` is added to every page
+- `robots.txt` disallows everything
+- no sitemap is generated
+
+Those are deliberately tied to one flag. A `.pages.dev` URL full of placeholder
+copy must not be indexed, so you cannot get the lenient build without also
+getting the crawler blocks.
+
+The placeholder badges still render — the client seeing **? address** where the
+address will go is the point of the exercise, not a bug to hide.
+
+> **`PREVIEW` must never be set on the production deployment.** In this repo it
+> appears in exactly one place — the `build:preview` script — and nowhere in CI
+> or any deployment config, so it cannot be switched on by accident. Before
+> going live, check that the Cloudflare Pages project has no `PREVIEW`
+> environment variable set on its production environment. With it unset, every
+> behaviour above reverts and the build fails on any remaining `TODO_`.
+
+There is a separate flag, `ALLOW_PLACEHOLDERS=1`, used by `npm run build:audit`.
+It also builds through placeholders but leaves the page indexable, because
+preview mode's `noindex` would invalidate a Lighthouse SEO score. It is for
+local auditing only and must not be deployed.
+
+---
+
 ## Before launch
 
 Nothing can go live until these are filled in. `npm run placeholders` prints the
@@ -74,6 +113,10 @@ The two WhatsApp numbers are already set and correct:
 Still needed in the same file: `TODO_SITE_URL` (the real domain), `TODO_EMAIL`,
 `TODO_ADDRESS`, `TODO_MAPS_URL`, `TODO_FACEBOOK_URL`, `TODO_INSTAGRAM_URL`,
 `TODO_LATITUDE` / `TODO_LONGITUDE`, and `TODO_CLOUDFLARE_ANALYTICS_TOKEN`.
+
+The site currently builds against `https://hibiscus-dive-inn.pages.dev`. When the
+custom domain is ready, change `SITE_URL` in `astro.config.mjs` — it is marked
+with a `TODO` — and set `SITE.url` in `src/config/site.ts` to match.
 
 Analytics stays switched off until that last one is set, so the site currently
 loads no third-party scripts at all and needs no cookie banner.
