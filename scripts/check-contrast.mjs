@@ -14,12 +14,13 @@ const PALETTE = {
 	shell: '#F6F2EA',
 	signal: '#FFA83C',
 	// Derived tokens from tokens.css
-	'surface/bg-sunk': '#CFC5B2',
-	'surface/fg-muted': '#4A5A63',
+	'surface/bg-sunk': '#D0C6B3',
+	'surface/fg-muted': '#43525A',
 	'surface/rule': '#B5A992',
-	'surface/rail-tick': '#63717A',
+	'surface/rail-tick': '#5E6C75',
 	'surface/cta-hover': '#F09420',
 	'deep/bg-raised': '#0E2F42',
+	'deep/bg-sunk': '#05161F',
 	'deep/fg-muted': '#A9C2CC',
 	'deep/rule': '#24505F',
 	'deep/rail-tick': '#7D9AA6',
@@ -33,6 +34,14 @@ const PAIRS = [
 	['abyss', 'shell', 'text on cards', 4.5],
 	['surface/fg-muted', 'sand', 'muted text', 4.5],
 	['surface/fg-muted', 'shell', 'muted text on cards', 4.5],
+	/*
+	 * The sunk surface is darker than the page background and is easy to
+	 * forget — the rooms section sits on it. Lighthouse caught a real failure
+	 * here that this file had not been testing.
+	 */
+	['surface/fg-muted', 'surface/bg-sunk', 'muted text on the sunk surface', 4.5],
+	['midwater', 'surface/bg-sunk', 'links on the sunk surface', 4.5],
+	['surface/rail-tick', 'surface/bg-sunk', 'rail ticks over the sunk surface', 3],
 	['midwater', 'sand', 'links', 4.5],
 	['midwater', 'shell', 'links on cards', 4.5],
 	['abyss', 'signal', 'CTA label on amber fill', 4.5],
@@ -44,6 +53,10 @@ const PAIRS = [
 	['shell', 'deep/bg-raised', 'text on cards', 4.5],
 	['deep/fg-muted', 'abyss', 'muted text', 4.5],
 	['deep/fg-muted', 'deep/bg-raised', 'muted text on cards', 4.5],
+	['deep/fg-muted', 'deep/bg-sunk', 'muted text on the sunk surface', 4.5],
+	['shell', 'deep/bg-sunk', 'body text on the sunk surface', 4.5],
+	['shallow', 'deep/bg-sunk', 'links on the sunk surface', 4.5],
+	['deep/rail-tick', 'deep/bg-sunk', 'rail ticks over the sunk surface', 3],
 	['shallow', 'abyss', 'links', 4.5],
 	['shallow', 'deep/bg-raised', 'links on cards', 4.5],
 	['signal', 'abyss', 'link hover / rail marker', 4.5],

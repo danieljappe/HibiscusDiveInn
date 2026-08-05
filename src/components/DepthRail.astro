@@ -1,0 +1,312 @@
+---
+/**
+ * The depth rail.
+ *
+ * A thin fixed rail down the left edge, ticked in mono type. The marker
+ * descends as the visitor scrolls and each tick lights while its section is on
+ * screen. Decoration with meaning — it is aria-hidden and duplicates headings
+ * that are reachable by every other means, so it is never the only route to a
+ * section.
+ *
+ * Three tiers, each a strict enhancement of the one below:
+ *
+ *   1. No JS, no modern CSS — everything renders static, marker at the top.
+ *      This is also exactly what prefers-reduced-motion gets.
+ *   2. CSS scroll-driven animations — marker bound to scroll progress, ticks
+ *      bound to their section's view timeline. Zero JavaScript.
+ *   3. IntersectionObserver — only loaded when tier 2 is unsupported.
+ *
+ * Tier 2 needs a timeline name per section, which has to be generated from the
+ * tick list, hence the inline style block.
+ */
+import type { DepthTick } from '../config/depths';
+
+interface Props {
+	ticks: readonly DepthTick[];
+}
+
+const { ticks } = Astro.props;
+
+const deepest = Math.max(...ticks.map((tick) => tick.depth), 1);
+
+/** Position down the rail, 0-100%, proportional to depth. */
+const positionOf = (tick: DepthTick) => (tick.depth / deepest) * 100;
+
+/*
+ * Per-section timelines. `timeline-scope` lifts each section's view timeline
+ * to the root so a tick — which is not a descendant of its section — can bind
+ * to it.
+ */
+const timelineNames = ticks.map((tick) => `--sec-${tick.id}`).join(', ');
+
+/*
+ * All of tier 2 lives in this inline block rather than in the scoped <style>
+ * below, and that is deliberate.
+ *
+ * The CSS minifier folds
+ *     animation: rail-descend linear both;
+ *     animation-timeline: scroll(root block);
+ * into the single shorthand `animation: linear both rail-descend scroll(root)`.
+ * Browsers do not accept a timeline inside the `animation` shorthand, so the
+ * whole declaration is dropped and the marker never moves. An `is:inline`
+ * style is emitted verbatim, which keeps the longhands apart.
+ */
+const generatedCss = `
+@supports (animation-timeline: scroll()) {
+	@media (prefers-reduced-motion: no-preference) {
+		:root { timeline-scope: ${timelineNames}; }
+
+		@keyframes rail-descend {
+			from { top: 4.5rem; }
+			to { top: calc(100% - 4.5rem); }
+		}
+
+		@keyframes rail-tick-active {
+			0%, 100% { color: var(--rail-tick); }
+			35%, 65% { color: var(--rail-active); }
+		}
+
+		.rail__marker {
+			animation-name: rail-descend;
+			animation-duration: auto;
+			animation-timing-function: linear;
+			animation-fill-mode: both;
+			animation-timeline: scroll(root block);
+		}
+
+		${ticks.map((tick) => `#${tick.id} { view-timeline-name: --sec-${tick.id}; }`).join('\n\t\t')}
+
+		${ticks
+			.map(
+				(tick) => `.rail__tick[data-for="${tick.id}"] {
+			animation-name: rail-tick-active;
+			animation-duration: auto;
+			animation-timing-function: linear;
+			animation-fill-mode: both;
+			animation-timeline: --sec-${tick.id};
+			animation-range: cover 0% cover 100%;
+		}`,
+			)
+			.join('\n\t\t')}
+	}
+}`.trim();
+---
+
+<aside class="rail" aria-hidden="true" data-depth-rail>
+	<div class="rail__line"></div>
+
+	<ol class="rail__ticks">
+		{
+			ticks.map((tick) => (
+				<li
+					class="rail__tick"
+					data-for={tick.id}
+					style={`--pos: ${positionOf(tick)}%`}
+					title={tick.label}
+				>
+					<span class="rail__dash" />
+					<span class="rail__label">{tick.depth === 0 ? '0' : `-${tick.depth}`}m</span>
+				</li>
+			))
+		}
+	</ol>
+
+	<div class="rail__marker" data-rail-marker></div>
+</aside>
+
+<style is:inline set:html={generatedCss}></style>
+
+<style>
+	.rail {
+		position: fixed;
+		inset-block: 0;
+		inset-inline-start: 0;
+		z-index: 3;
+		width: var(--rail-width);
+		pointer-events: none;
+		/* Padding keeps the first and last ticks clear of the viewport edges. */
+		padding-block: 4.5rem;
+	}
+
+	/* Never crowd the content: below 360px the rail is gone entirely. */
+	@media (max-width: 359px) {
+		.rail {
+			display: none;
+		}
+	}
+
+	.rail__line {
+		position: absolute;
+		inset-block: 4.5rem;
+		inset-inline-start: calc(var(--rail-width) / 2);
+		width: 1px;
+		background-color: var(--rail-line);
+	}
+
+	.rail__ticks {
+		position: relative;
+		height: 100%;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.rail__tick {
+		position: absolute;
+		inset-inline-start: 0;
+		top: var(--pos);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 2px;
+		width: 100%;
+		/* Tier 1 and reduced motion: every tick renders at rest, legibly. */
+		color: var(--rail-tick);
+		transform: translateY(-50%);
+	}
+
+	.rail__dash {
+		width: 7px;
+		height: 1px;
+		background-color: currentColor;
+	}
+
+	.rail__label {
+		font-family: var(--font-mono);
+		font-size: 9px;
+		line-height: 1;
+		letter-spacing: 0;
+		color: currentColor;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.rail__marker {
+		position: absolute;
+		inset-inline-start: calc(var(--rail-width) / 2 - 3px);
+		top: 4.5rem;
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		background-color: var(--rail-active);
+	}
+
+	/*
+	 * Tier 2 (CSS scroll-driven) is in the inline block above — see the note
+	 * there about the minifier folding animation longhands into a shorthand
+	 * the browser rejects.
+	 */
+
+	/* ---- Tier 3: IntersectionObserver fallback ---------------------------- */
+
+	.rail__tick[data-active] {
+		color: var(--rail-active);
+	}
+
+	/*
+	 * Movement is opt-in. Under reduced motion the marker sits at the surface
+	 * and nothing animates — the rail still reads as a labelled scale.
+	 */
+	@media (prefers-reduced-motion: reduce) {
+		.rail__marker {
+			animation: none;
+			top: 4.5rem;
+		}
+	}
+</style>
+
+<script is:inline>
+	/*
+	 * Only runs where CSS scroll-driven animations are unavailable. Everywhere
+	 * else this costs nothing but the bytes, and it exits immediately.
+	 */
+	(function () {
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+		var rail = document.querySelector('[data-depth-rail]');
+		if (!rail) return;
+
+		var marker = rail.querySelector('[data-rail-marker]');
+		var ticks = rail.querySelectorAll('.rail__tick');
+		if (!marker || !ticks.length) return;
+
+		/*
+		 * Do not trust CSS.supports() here. A browser can parse
+		 * `animation-timeline: scroll()` — and report it as supported — while
+		 * the feature is switched off, leaving the timeline permanently
+		 * inactive and the rail frozen. Ask the animation itself whether it is
+		 * actually being driven.
+		 */
+		function cssIsDriving() {
+			if (!marker.getAnimations) return false;
+			var running = marker.getAnimations();
+			for (var i = 0; i < running.length; i++) {
+				try {
+					var timeline = running[i].timeline;
+					if (timeline && timeline.currentTime != null) return true;
+				} catch (e) {
+					/* Inaccessible timeline counts as not driving. */
+				}
+			}
+			return false;
+		}
+
+		function start() {
+			if (cssIsDriving()) return;
+			activate();
+		}
+
+		function activate() {
+			var observer = new IntersectionObserver(
+				function (entries) {
+					entries.forEach(function (entry) {
+						var tick = rail.querySelector('.rail__tick[data-for="' + entry.target.id + '"]');
+						if (!tick) return;
+						if (entry.isIntersecting) tick.setAttribute('data-active', '');
+						else tick.removeAttribute('data-active');
+					});
+				},
+				{ rootMargin: '-45% 0px -45% 0px' },
+			);
+
+			ticks.forEach(function (tick) {
+				var section = document.getElementById(tick.getAttribute('data-for'));
+				if (section) observer.observe(section);
+			});
+
+			function place() {
+				var doc = document.documentElement;
+				var max = doc.scrollHeight - window.innerHeight;
+				var progress = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+				marker.style.top = 'calc(4.5rem + ' + progress + ' * (100% - 9rem))';
+			}
+
+			/*
+			 * Called straight from the listener rather than deferred to
+			 * requestAnimationFrame. rAF is throttled to nothing in a tab that
+			 * is not painting, which would leave the marker stale when the tab
+			 * came forward. This writes one custom property on one element and
+			 * the listener is passive, so it does not block scrolling.
+			 */
+			window.addEventListener('scroll', place, { passive: true });
+			window.addEventListener('resize', place, { passive: true });
+
+			place();
+		}
+
+		/*
+		 * Not requestAnimationFrame: a tab that is not being painted throttles
+		 * rAF indefinitely, so the rail would never initialise there and would
+		 * stay frozen when the tab was brought forward. DOMContentLoaded fires
+		 * regardless of whether the page is rendering.
+		 *
+		 * Activating the fallback when CSS is in fact driving is harmless —
+		 * animation declarations outrank inline styles in the cascade, so the
+		 * CSS marker position still wins.
+		 */
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', start, { once: true });
+		} else {
+			start();
+		}
+	})();
+</script>

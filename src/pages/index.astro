@@ -3,11 +3,13 @@
  * The homepage: one scroll from the surface down to -30m.
  *
  * Sections carry the ids the depth rail keys off (see src/config/depths.ts).
- * The rail itself arrives in the polish stage.
  */
+import { getCollection } from 'astro:content';
+
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import DepthRail from '../components/DepthRail.astro';
 
 import Hero from '../components/sections/home/Hero.astro';
 import About from '../components/sections/home/About.astro';
@@ -17,11 +19,30 @@ import GettingHere from '../components/sections/home/GettingHere.astro';
 import Contact from '../components/sections/home/Contact.astro';
 
 import { SITE } from '../config/site';
+import { HOME_DEPTHS } from '../config/depths';
+import { lodgingBusinessSchema, websiteSchema } from '../lib/schema';
 
 const description = `${SITE.description} Enquiries by WhatsApp.`;
+const ogImage = '/og-default.png';
+
+const rooms = (await getCollection('rooms', ({ data }) => !data.draft))
+	.sort((a, b) => a.data.order - b.data.order)
+	.map(({ data }) => ({ title: data.title, sleeps: data.sleeps }));
+
+const jsonLd = [
+	websiteSchema(Astro.site),
+	lodgingBusinessSchema({ site: Astro.site, ogImage, rooms }),
+];
 ---
 
-<BaseLayout title={SITE.name} description={description} theme="surface">
+<BaseLayout
+	title={SITE.name}
+	description={description}
+	theme="surface"
+	ogImage={ogImage}
+	jsonLd={jsonLd}
+>
+	<DepthRail slot="rail" ticks={HOME_DEPTHS} />
 	<Header slot="header" current="home" />
 
 	<Hero />

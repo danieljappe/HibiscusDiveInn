@@ -38,9 +38,18 @@ export const HOME_DEPTHS: readonly DepthTick[] = [
  */
 export const DIVE_SITE_RANGE = { shallowest: 14, deepest: 30 } as const;
 
-export const DIVING_DEPTHS: readonly DepthTick[] = [
-	{ id: 'diving-intro', depth: 12, label: 'Descent' },
-	{ id: 'dive-sites', depth: 14, label: 'Dive sites' },
+/**
+ * The fixed sections of /diving. Dive site ticks are generated from the
+ * collection and inserted between the intro and the courses — see
+ * `railDepthsForSites`.
+ */
+export const DIVING_INTRO_DEPTH: DepthTick = {
+	id: 'diving-intro',
+	depth: 12,
+	label: 'Descent',
+};
+
+export const DIVING_TAIL_DEPTHS: readonly DepthTick[] = [
 	{ id: 'courses', depth: 32, label: 'Courses' },
 	{ id: 'equipment', depth: 36, label: 'Equipment' },
 	{ id: 'instructor', depth: 40, label: 'Instructor' },
@@ -51,7 +60,7 @@ export const DIVING_DEPTHS: readonly DepthTick[] = [
  * Positions dive sites on the rail. Uses real `depthMaxM` values when every
  * site has one; otherwise falls back to even spacing by authored order.
  */
-export function railDepthsForSites<T extends { id: string; depthMaxM?: number }>(
+export function railDepthsForSites<T extends { id: string; label: string; depthMaxM?: number }>(
 	sites: readonly T[],
 ): DepthTick[] {
 	const haveRealDepths = sites.length > 0 && sites.every((s) => typeof s.depthMaxM === 'number');
@@ -59,7 +68,7 @@ export function railDepthsForSites<T extends { id: string; depthMaxM?: number }>
 	if (haveRealDepths) {
 		return [...sites]
 			.sort((a, b) => (a.depthMaxM as number) - (b.depthMaxM as number))
-			.map((site) => ({ id: site.id, depth: site.depthMaxM as number, label: site.id }));
+			.map((site) => ({ id: site.id, depth: site.depthMaxM as number, label: site.label }));
 	}
 
 	const { shallowest, deepest } = DIVE_SITE_RANGE;
@@ -67,6 +76,6 @@ export function railDepthsForSites<T extends { id: string; depthMaxM?: number }>
 	return sites.map((site, index) => ({
 		id: site.id,
 		depth: Math.round(shallowest + step * index),
-		label: site.id,
+		label: site.label,
 	}));
 }

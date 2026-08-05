@@ -11,8 +11,13 @@ import { SITE } from './src/config/site.ts';
  * `site` is required for canonical URLs and the sitemap. It is a TODO_
  * placeholder until the domain is confirmed, so a fallback is used to keep the
  * build running — the placeholder guard is what refuses to ship it.
+ *
+ * PREVIEW_SITE overrides it for a local or staging build, so canonical and
+ * Open Graph URLs resolve to something real while auditing (Lighthouse marks
+ * a canonical pointing at an unreachable domain as invalid).
  */
-const siteUrl = SITE.url.startsWith('TODO_') ? 'https://example.invalid' : SITE.url;
+const siteUrl =
+	process.env.PREVIEW_SITE ?? (SITE.url.startsWith('TODO_') ? 'https://example.invalid' : SITE.url);
 
 // https://astro.build/config
 export default defineConfig({

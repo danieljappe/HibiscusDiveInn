@@ -103,9 +103,9 @@
 [data-theme='surface'] {
 	--bg: var(--sand);
 	--bg-raised: var(--shell);
-	--bg-sunk: #cfc5b2;
+	--bg-sunk: #d0c6b3;
 	--fg: var(--abyss);
-	--fg-muted: #4a5a63;
+	--fg-muted: #43525a;
 	/* Decorative hairline. Not held to 3:1 — it separates, it does not inform. */
 	--rule: #b5a992;
 	--link: var(--midwater);
@@ -121,7 +121,7 @@
 
 	--focus-ring: var(--abyss);
 	--rail-line: #b5a992;
-	--rail-tick: #63717a;
+	--rail-tick: #5e6c75;
 	--rail-active: var(--abyss);
 }
 
