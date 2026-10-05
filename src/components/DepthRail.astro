@@ -14,7 +14,7 @@
  *      This is also exactly what prefers-reduced-motion gets.
  *   2. CSS scroll-driven animations — marker bound to scroll progress, ticks
  *      bound to their section's view timeline. Zero JavaScript.
- *   3. IntersectionObserver — only loaded when tier 2 is unsupported.
+ *   3. A small scroll listener — only active when tier 2 is unsupported.
  *
  * Tier 2 needs a timeline name per section, which has to be generated from the
  * tick list, hence the inline style block.
@@ -27,10 +27,51 @@ interface Props {
 
 const { ticks } = Astro.props;
 
-const deepest = Math.max(...ticks.map((tick) => tick.depth), 1);
+const shallowest = Math.min(...ticks.map((tick) => tick.depth));
+const deepest = Math.max(...ticks.map((tick) => tick.depth));
+const span = Math.max(deepest - shallowest, 1);
 
-/** Position down the rail, 0-100%, proportional to depth. */
-const positionOf = (tick: DepthTick) => (tick.depth / deepest) * 100;
+/**
+ * Position down the rail, 0-100%, proportional to depth. The scale runs from
+ * the page's own shallowest tick, so the first tick sits at the top of the
+ * rail where the marker starts — /diving begins at -12m, not at the surface.
+ */
+const positionOf = (tick: DepthTick) => ((tick.depth - shallowest) / span) * 100;
+
+/** The marker's `top` for a rail position, inside the rail's 4.5rem padding. */
+const markerTop = (pos: number) => `calc(4.5rem + (100% - 9rem) * ${pos / 100})`;
+
+/*
+ * The marker tracks sections, not raw scroll progress. Sections are not sized
+ * in proportion to their depth, so a marker driven by overall scroll would
+ * pass each tick at the wrong moment and disagree with the highlighted one.
+ *
+ * Instead each section owns the line across the middle of the viewport while
+ * it straddles it — that is when its tick lights — and the marker sits on that
+ * tick. As the next section's top rises from 60% to 50% of the viewport the
+ * marker glides down to the next tick, arriving as that tick lights.
+ *
+ * In view-timeline terms `cover 0` is the section's top at the viewport
+ * bottom, so `cover 40vh` is its top at 60% and `cover 50vh` is its top at the
+ * midline. The JS fallback below uses the same 0.6 / 0.5 thresholds.
+ */
+const MIDLINE_RANGE = 'cover 50vh cover calc(100% - 50vh)';
+const GLIDE_RANGE = 'cover 40vh cover 50vh';
+
+/*
+ * One glide per section boundary, listed in page order. Each fills forwards,
+ * so once a boundary is passed it holds the marker on that tick, and a later
+ * animation in the list overrides an earlier one, so the deepest boundary
+ * passed wins. Only the first also fills backwards, which parks the marker on
+ * the first tick at the top of the page.
+ */
+const glides = ticks.slice(1).map((tick, i) => ({
+	name: `rail-to-${tick.id}`,
+	timeline: `--sec-${tick.id}`,
+	from: markerTop(positionOf(ticks[i])),
+	to: markerTop(positionOf(tick)),
+	fill: i === 0 ? 'both' : 'forwards',
+}));
 
 /*
  * Per-section timelines. `timeline-scope` lifts each section's view timeline
@@ -56,22 +97,23 @@ const generatedCss = `
 	@media (prefers-reduced-motion: no-preference) {
 		:root { timeline-scope: ${timelineNames}; }
 
-		@keyframes rail-descend {
-			from { top: 4.5rem; }
-			to { top: calc(100% - 4.5rem); }
-		}
-
 		@keyframes rail-tick-active {
-			0%, 100% { color: var(--rail-tick); }
-			35%, 65% { color: var(--rail-active); }
+			from, to { color: var(--rail-active); }
 		}
 
-		.rail__marker {
-			animation-name: rail-descend;
+		${glides.map((g) => `@keyframes ${g.name} { from { top: ${g.from}; } to { top: ${g.to}; } }`).join('\n\t\t')}
+
+		${
+			glides.length
+				? `.rail__marker {
+			animation-name: ${glides.map((g) => g.name).join(', ')};
 			animation-duration: auto;
 			animation-timing-function: linear;
-			animation-fill-mode: both;
-			animation-timeline: scroll(root block);
+			animation-fill-mode: ${glides.map((g) => g.fill).join(', ')};
+			animation-timeline: ${glides.map((g) => g.timeline).join(', ')};
+			animation-range: ${glides.map(() => GLIDE_RANGE).join(', ')};
+		}`
+				: ''
 		}
 
 		${ticks.map((tick) => `#${tick.id} { view-timeline-name: --sec-${tick.id}; }`).join('\n\t\t')}
@@ -82,9 +124,9 @@ const generatedCss = `
 			animation-name: rail-tick-active;
 			animation-duration: auto;
 			animation-timing-function: linear;
-			animation-fill-mode: both;
+			animation-fill-mode: none;
 			animation-timeline: --sec-${tick.id};
-			animation-range: cover 0% cover 100%;
+			animation-range: ${MIDLINE_RANGE};
 		}`,
 			)
 			.join('\n\t\t')}
@@ -111,7 +153,12 @@ const generatedCss = `
 		}
 	</ol>
 
-	<div class="rail__marker" data-rail-marker></div>
+	<div
+		class="rail__marker"
+		data-rail-marker
+		data-positions={JSON.stringify(ticks.map(positionOf))}
+	>
+	</div>
 </aside>
 
 <style is:inline set:html={generatedCss}></style>
@@ -162,7 +209,12 @@ const generatedCss = `
 		width: 100%;
 		/* Tier 1 and reduced motion: every tick renders at rest, legibly. */
 		color: var(--rail-tick);
-		transform: translateY(-50%);
+		/*
+		 * Anchored on the dash, not the dash-plus-label block, so the dash sits
+		 * exactly on --pos where the marker's centre lands. The label hangs
+		 * below it like a ruler mark.
+		 */
+		transform: translateY(-0.5px);
 	}
 
 	.rail__dash {
@@ -184,6 +236,8 @@ const generatedCss = `
 		position: absolute;
 		inset-inline-start: calc(var(--rail-width) / 2 - 3px);
 		top: 4.5rem;
+		/* Centred on its position, the same way the ticks are. */
+		transform: translateY(-50%);
 		width: 7px;
 		height: 7px;
 		border-radius: 50%;
@@ -196,7 +250,7 @@ const generatedCss = `
 	 * the browser rejects.
 	 */
 
-	/* ---- Tier 3: IntersectionObserver fallback ---------------------------- */
+	/* ---- Tier 3: JS fallback --------------------------------------------- */
 
 	.rail__tick[data-active] {
 		color: var(--rail-active);
@@ -256,36 +310,41 @@ const generatedCss = `
 		}
 
 		function activate() {
-			var observer = new IntersectionObserver(
-				function (entries) {
-					entries.forEach(function (entry) {
-						var tick = rail.querySelector('.rail__tick[data-for="' + entry.target.id + '"]');
-						if (!tick) return;
-						if (entry.isIntersecting) tick.setAttribute('data-active', '');
-						else tick.removeAttribute('data-active');
-					});
-				},
-				{ rootMargin: '-45% 0px -45% 0px' },
-			);
-
+			var sections = [];
 			ticks.forEach(function (tick) {
-				var section = document.getElementById(tick.getAttribute('data-for'));
-				if (section) observer.observe(section);
+				sections.push(document.getElementById(tick.getAttribute('data-for')));
 			});
+			var positions = JSON.parse(marker.getAttribute('data-positions') || '[]');
 
+			/* The same rule as the CSS tier: see MIDLINE_RANGE and GLIDE_RANGE. */
 			function place() {
-				var doc = document.documentElement;
-				var max = doc.scrollHeight - window.innerHeight;
-				var progress = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
-				marker.style.top = 'calc(4.5rem + ' + progress + ' * (100% - 9rem))';
+				var vh = window.innerHeight;
+				var mid = vh * 0.5;
+				var pos = positions[0] || 0;
+
+				for (var i = 0; i < sections.length; i++) {
+					var section = sections[i];
+					if (!section) continue;
+					var box = section.getBoundingClientRect();
+
+					if (box.top <= mid && box.bottom > mid) ticks[i].setAttribute('data-active', '');
+					else ticks[i].removeAttribute('data-active');
+
+					if (i > 0 && box.top <= vh * 0.6) {
+						var t = Math.min(1, (vh * 0.6 - box.top) / (vh * 0.1));
+						pos = positions[i - 1] + t * (positions[i] - positions[i - 1]);
+					}
+				}
+
+				marker.style.top = 'calc(4.5rem + (100% - 9rem) * ' + pos / 100 + ')';
 			}
 
 			/*
 			 * Called straight from the listener rather than deferred to
 			 * requestAnimationFrame. rAF is throttled to nothing in a tab that
 			 * is not painting, which would leave the marker stale when the tab
-			 * came forward. This writes one custom property on one element and
-			 * the listener is passive, so it does not block scrolling.
+			 * came forward. The listener is passive, so it does not block
+			 * scrolling.
 			 */
 			window.addEventListener('scroll', place, { passive: true });
 			window.addEventListener('resize', place, { passive: true });

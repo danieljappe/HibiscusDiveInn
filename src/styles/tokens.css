@@ -81,6 +81,11 @@
 	--duration-base: 220ms;
 }
 
+/* Pages without a depth rail (the homepage) give its gutter back to the content. */
+:root:not([data-rail]) {
+	--rail-width: 0px;
+}
+
 /*
  * ---- Themes -------------------------------------------------------------
  * `surface` is the homepage, `deep` is /diving. Semantic tokens are the only

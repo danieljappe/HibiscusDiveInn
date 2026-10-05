@@ -29,7 +29,7 @@ const cards = [
 		ink: '#08202E',
 		muted: '#4A5A63',
 		rule: '#B5A992',
-		title: 'Hibiscus Dive Inn',
+		title: 'Hibiscus Coral Inn',
 		subtitle: 'Bantayan Island · Cebu · Philippines',
 	},
 	{
@@ -39,7 +39,7 @@ const cards = [
 		muted: '#A9C2CC',
 		rule: '#24505F',
 		title: 'Diving Bantayan',
-		subtitle: 'House reef · Small groups · One instructor',
+		subtitle: 'With Island Divers · House reef · Small groups',
 	},
 ];
 

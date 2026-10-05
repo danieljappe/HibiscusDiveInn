@@ -5,7 +5,7 @@
  */
 import WhatsAppLink from '../../WhatsAppLink.astro';
 import Placeholder from '../../primitives/Placeholder.astro';
-import { CONTACT, CHANNELS } from '../../../config/site';
+import { CONTACT, CHANNELS, DIVE_CENTRE } from '../../../config/site';
 import { formatPhone, telHref } from '../../../lib/phone';
 import { isPlaceholder } from '../../../lib/placeholders';
 ---
@@ -42,7 +42,7 @@ import { isPlaceholder } from '../../../lib/placeholders';
 				</div>
 
 				<div class="contact__item">
-					<dt>The dive centre</dt>
+					<dt>{DIVE_CENTRE.name}</dt>
 					<dd>
 						<a class="data" href={telHref(CHANNELS.dive.number)}>
 							{formatPhone(CHANNELS.dive.number)}

@@ -5,9 +5,7 @@
  * and the rail's marker descends as the visitor scrolls. Depths are authored
  * here rather than in components so they can be retuned in one file.
  *
- * The brief fixes four homepage ticks (0, -4, -12, -30). `about` at -2m and
- * `getting-here` at -20m are interpolated to keep the scale monotonic across
- * all six sections.
+ * The rail only appears on /diving; the homepage stays at the surface.
  */
 
 export type DepthTick = {
@@ -18,15 +16,6 @@ export type DepthTick = {
 	/** Short label announced beside the tick. */
 	label: string;
 };
-
-export const HOME_DEPTHS: readonly DepthTick[] = [
-	{ id: 'hero', depth: 0, label: 'Surface' },
-	{ id: 'about', depth: 2, label: 'About' },
-	{ id: 'rooms', depth: 4, label: 'Rooms' },
-	{ id: 'diving', depth: 12, label: 'Diving' },
-	{ id: 'getting-here', depth: 20, label: 'Getting here' },
-	{ id: 'contact', depth: 30, label: 'Contact' },
-];
 
 /**
  * `/diving` continues from -12m, where the homepage teaser sat.

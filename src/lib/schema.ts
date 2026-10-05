@@ -1,4 +1,4 @@
-import { SITE, CONTACT, CHANNELS } from '../config/site';
+import { SITE, CONTACT, CHANNELS, DIVE_CENTRE } from '../config/site';
 import { isPlaceholder } from './placeholders';
 
 /**
@@ -40,7 +40,7 @@ function contactPoints() {
 			'@type': 'ContactPoint',
 			telephone: `+${CHANNELS.dive.number}`,
 			contactType: 'customer service',
-			name: 'Dive centre',
+			name: DIVE_CENTRE.name,
 			areaServed: 'PH',
 			availableLanguage: 'en',
 		}),
@@ -117,14 +117,15 @@ export function divingSchema(options: {
 		'@type': 'Service',
 		'@id': absolute('/diving#service', site),
 		serviceType: 'Scuba diving and dive courses',
-		name: `Diving with ${SITE.name}`,
+		name: `Diving with ${DIVE_CENTRE.name}`,
 		description: `Guided dives and dive courses on ${SITE.place.island}, ${SITE.place.province}, Philippines.`,
 		url: absolute('/diving', site),
 		image: absolute(ogImage, site),
 		provider: clean({
-			'@type': 'LodgingBusiness',
-			'@id': absolute('/#lodging', site),
-			name: SITE.name,
+			'@type': 'LocalBusiness',
+			name: DIVE_CENTRE.name,
+			hasMap: DIVE_CENTRE.reviewsUrl,
+			telephone: `+${CHANNELS.dive.number}`,
 		}),
 		areaServed: clean({
 			'@type': 'Place',

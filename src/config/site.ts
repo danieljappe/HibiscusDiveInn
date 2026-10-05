@@ -7,16 +7,18 @@
  */
 
 export const SITE = {
-	name: 'Hibiscus Dive Inn',
+	name: 'Hibiscus Coral Inn',
 	/** Used in <title> after the page name. */
-	shortName: 'Hibiscus Dive Inn',
-	tagline: 'A small dive inn on Bantayan Island',
+	shortName: 'Hibiscus Coral Inn',
+	tagline: 'A small inn on Bantayan Island',
+	/** The line under the name in the hero. */
+	lede: 'A handful of quiet rooms, a short walk from the water.',
 	/** Canonical origin, no trailing slash. Set before launch. */
 	url: 'TODO_SITE_URL',
 	locale: 'en',
 	region: 'PH',
 	description:
-		'A small, owner-run dive inn on Bantayan Island, Cebu. Simple rooms, house reef diving and courses with a single instructor.',
+		'A small, owner-run inn on Bantayan Island, Cebu. Simple, quiet rooms a short walk from the water, with diving next door through Island Divers.',
 	/** Geo-targeting for search. */
 	place: {
 		island: 'Bantayan Island',
@@ -25,6 +27,17 @@ export const SITE = {
 		latitude: 'TODO_LATITUDE',
 		longitude: 'TODO_LONGITUDE',
 	},
+} as const;
+
+/**
+ * The dive centre is a separate business with the same owners. The rooms are
+ * the inn's product; diving is offered alongside through Island Divers. It
+ * may get its own site later — until then it lives at /diving on this one.
+ */
+export const DIVE_CENTRE = {
+	name: 'Island Divers',
+	/** Google Maps listing, which carries the dive centre's reviews. */
+	reviewsUrl: 'https://maps.app.goo.gl/c6YD1M7N8WPJANvx8',
 } as const;
 
 /**
@@ -46,7 +59,7 @@ export type ContactChannel = 'inn' | 'dive';
 /** Resolves a channel to its number and the label shown next to it. */
 export const CHANNELS = {
 	inn: { number: CONTACT.whatsappInn, label: 'the inn' },
-	dive: { number: CONTACT.whatsappDive, label: 'the dive centre' },
+	dive: { number: CONTACT.whatsappDive, label: DIVE_CENTRE.name },
 } as const satisfies Record<ContactChannel, { number: string; label: string }>;
 
 /**
@@ -63,7 +76,7 @@ export const ANALYTICS = {
  *
  * The whole point is that the owner receives a structured enquiry rather than
  * "hi is it free?". `inn` is the default from the brief; `dive` is its
- * equivalent for the dive centre's line.
+ * equivalent for Island Divers' line.
  */
 export const ENQUIRY_TEMPLATES = {
 	inn: [
@@ -75,7 +88,7 @@ export const ENQUIRY_TEMPLATES = {
 	].join('\n'),
 
 	dive: [
-		`Hi ${SITE.name}! I'd like to ask about diving.`,
+		`Hi ${DIVE_CENTRE.name}! I'd like to ask about diving.`,
 		'',
 		'Dates:',
 		'Divers:',

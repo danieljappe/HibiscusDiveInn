@@ -1,6 +1,6 @@
-# Hibiscus Dive Inn
+# Hibiscus Coral Inn
 
-Static marketing site for a small dive inn on Bantayan Island, Cebu, Philippines.
+Static marketing site for a small inn on Bantayan Island, Cebu, Philippines.
 Two pages, no booking system — enquiries go to WhatsApp.
 
 Built with [Astro](https://astro.build), plain CSS, and no client-side framework.
@@ -108,7 +108,7 @@ current list with file names and line numbers.
 The two WhatsApp numbers are already set and correct:
 
 - **Inn** `+63 977 328 4208` — rooms and general enquiries
-- **Dive centre** `+63 939 845 0270` — courses and dive enquiries
+- **Island Divers** (dive centre) `+63 939 845 0270` — courses and dive enquiries
 
 Still needed in the same file: `TODO_SITE_URL` (the real domain), `TODO_EMAIL`,
 `TODO_ADDRESS`, `TODO_MAPS_URL`, `TODO_FACEBOOK_URL`, `TODO_INSTAGRAM_URL`,
@@ -183,20 +183,20 @@ The list below is the source of truth (it mirrors `src/config/images.ts`).
 
 | File                       | Size        | What it should show                                                                                                                                    |
 | -------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `hero-house-reef.jpg`      | 2400 × 1600 | The strongest single photo — shoreline, jetty, or a wide underwater shot of the house reef. Landscape, with room at the top where the resort name sits |
+| `hero.jpg`                 | 2400 × 1600 | ✅ Sunset swim off the beach. A shot of the inn or the shoreline in front of it would be better still. Landscape; the name sits bottom-left             |
 | `room-single.jpg`          | 1600 × 1200 | The single room, from the doorway, bed and window in frame                                                                                             |
 | `room-double.jpg`          | 1600 × 1200 | The double room, from the doorway so the whole room reads in one frame                                                                                 |
 | `room-four-person.jpg`     | 1600 × 1200 | The four-person room, wide enough to show all the beds                                                                                                 |
-| `diving-teaser.jpg`        | 1600 × 1000 | Underwater, with a diver in it. Darker and bluer is better — it carries the transition into the dark half of the site                                  |
-| `diving-header.jpg`        | 2400 × 1400 | The best underwater photo — wide, deep blue, ideally a diver for scale                                                                                 |
+| `diving-teaser.jpg`        | 1600 × 1000 | ✅ Diver beside a sea fan. Underwater, darker and bluer is better — it carries the transition into the dark half of the site                            |
+| `diving-header.jpg`        | 2400 × 1400 | ✅ Diver silhouetted against the sun. Wide, deep blue, ideally a diver for scale                                                                        |
 | `dive-site-house-reef.jpg` | 1600 × 1200 | The house reef underwater — coral, fish, whatever is characteristic                                                                                    |
 | `dive-site-two.jpg`        | 1600 × 1200 | The second dive site. Rename the file once the site has a name                                                                                         |
 | `dive-site-three.jpg`      | 1600 × 1200 | The third dive site. Rename the file once the site has a name                                                                                          |
 | `instructor.jpg`           | 1200 × 1500 | Portrait of the instructor. A real photo of a person, not stock — this relationship is what guests are buying. Portrait orientation                    |
 
 Social sharing cards live in `public/` at 1200 × 630: `og-default.png` and
-`og-diving.png`. They are currently plain colour with the name on them. Replace
-them with real crops when the photos arrive.
+`og-diving.png`. They are crops of the hero and diving header photos — redo
+them if either of those changes.
 
 ---
 

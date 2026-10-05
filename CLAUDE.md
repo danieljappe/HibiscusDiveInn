@@ -4,7 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
-# Hibiscus Dive Inn — Build Brief
+# Hibiscus Coral Inn — Build Brief
+
+> **Client direction, Sep 2026 (supersedes the brief where they conflict):**
+> The resort is renamed **Hibiscus Coral Inn** (formerly Hibiscus Dive Inn).
+> Marketing focuses on the **rooms**; diving is secondary. Diving is run by the
+> owners' own dive centre, **Island Divers**, which lives at `/diving` on this
+> domain for now and may get its own site later. Room details are still
+> placeholders until the owner finishes the rooms. The depth rail appears on
+> `/diving` only — not on the homepage.
 
 Static marketing site for a small dive resort on **Bantayan Island, Cebu, Philippines**.
 Mobile-first. No booking system. Enquiries go to WhatsApp.
@@ -218,7 +226,7 @@ https://wa.me/{number}?text={encodeURIComponent(message)}
 Default prefilled message:
 
 ```
-Hi Hibiscus Dive Inn! I'd like to ask about a stay.
+Hi Hibiscus Coral Inn! I'd like to ask about a stay.
 
 Dates:
 Guests:

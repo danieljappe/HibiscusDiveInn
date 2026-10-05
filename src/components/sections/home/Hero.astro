@@ -11,8 +11,8 @@ import { SITE } from '../../../config/site';
 <section class="hero" id="hero">
 	<div class="hero__media">
 		<Photo
-			src="hero-house-reef.jpg"
-			alt="Placeholder for a wide photograph of the shoreline and house reef at Hibiscus Dive Inn"
+			src="hero.jpg"
+			alt="A swimmer in a mask watches the sunset from the water off Bantayan, palm trees along the shore"
 			priority
 			sizes="100vw"
 		/>
@@ -23,7 +23,7 @@ import { SITE } from '../../../config/site';
 			{SITE.place.island} &middot; {SITE.place.province} &middot; {SITE.place.country}
 		</p>
 		<h1 class="hero__title">{SITE.name}</h1>
-		<p class="hero__lede">{SITE.tagline}. Rooms, a house reef, and one instructor.</p>
+		<p class="hero__lede">{SITE.tagline}. {SITE.lede}</p>
 
 		<div class="hero__cta">
 			<ContactMethods channel="inn" label="Ask about a stay" />
@@ -55,6 +55,12 @@ import { SITE } from '../../../config/site';
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+		/*
+		 * On a portrait phone only about a third of the photo's width fits.
+		 * The subject of the current photo sits right of centre, so the crop
+		 * leans that way. Retune if the hero photo changes.
+		 */
+		object-position: 70% center;
 	}
 
 	/*

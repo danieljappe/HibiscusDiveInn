@@ -48,7 +48,7 @@ const analyticsToken = isPlaceholder(ANALYTICS.cloudflareToken) ? null : ANALYTI
 ---
 
 <!doctype html>
-<html lang={SITE.locale} data-theme={theme}>
+<html lang={SITE.locale} data-theme={theme} data-rail={Astro.slots.has('rail') ? '' : undefined}>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />

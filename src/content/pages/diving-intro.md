@@ -1,10 +1,10 @@
 ---
 title: Diving Bantayan
 intro: >-
-  Small groups, one instructor, and a reef you can walk into. This is not a
-  high-volume dive centre and it is not trying to be.
+  Diving with Island Divers: small groups, one instructor, and a reef you can
+  walk into. This is not a high-volume dive centre and it is not trying to be.
 image: diving-header.jpg
-imageAlt: Placeholder for a wide underwater photograph
+imageAlt: A diver silhouetted against sunlight filtering down through blue water
 ---
 
 Bantayan sits at the north-west corner of Cebu, away from the busier dive

@@ -26,12 +26,12 @@ export type ImageSpec = {
 
 export const IMAGE_MANIFEST: readonly ImageSpec[] = [
 	{
-		file: 'hero-house-reef.jpg',
+		file: 'hero.jpg',
 		width: 2400,
 		height: 1600,
 		placeholderColour: '#1A5A6E',
 		brief:
-			'The strongest single photo you have — the shoreline, the jetty, or a wide underwater shot of the house reef. Landscape, shot wide, with room at the top where the resort name sits.',
+			'The strongest single photo of the place — currently a sunset swim off the beach. A shot of the inn itself or the shoreline in front of it would be better still. Landscape, shot wide; the name sits over the bottom-left.',
 		usedOn: 'Homepage hero',
 	},
 	{
