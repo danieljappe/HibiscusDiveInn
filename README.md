@@ -1,11 +1,15 @@
-# Hibiscus Coral Inn
+# Island Divers
 
-Static marketing site for a small inn on Bantayan Island, Cebu, Philippines.
-Two pages, no booking system — enquiries go to WhatsApp.
+Static marketing site for Island Divers, a small dive centre on Bantayan Island,
+Cebu, Philippines. One page, no booking system — enquiries go to WhatsApp.
+
+The owners' inn, Hibiscus Coral Inn, has its own site in `../HibiscusCoralInn`.
+This one links to it once, for divers who need somewhere to stay.
 
 Built with [Astro](https://astro.build), plain CSS, and no client-side framework.
-The production build ships **zero JavaScript** apart from a small inline fallback
-for the depth rail.
+The production build ships **almost no JavaScript**: a small inline fallback for
+the depth rail, and a few lines that close the menu after a link is tapped. The
+menu itself opens and closes without JavaScript.
 
 ---
 
@@ -105,14 +109,13 @@ current list with file names and line numbers.
 
 ### 1. Contact details — `src/config/site.ts`
 
-The two WhatsApp numbers are already set and correct:
-
-- **Inn** `+63 977 328 4208` — rooms and general enquiries
-- **Island Divers** (dive centre) `+63 939 845 0270` — courses and dive enquiries
+The WhatsApp number (`+63 939 845 0270`) and the Google Maps listing are already
+set and correct.
 
 Still needed in the same file: `TODO_SITE_URL` (the real domain), `TODO_EMAIL`,
-`TODO_ADDRESS`, `TODO_MAPS_URL`, `TODO_FACEBOOK_URL`, `TODO_INSTAGRAM_URL`,
-`TODO_LATITUDE` / `TODO_LONGITUDE`, and `TODO_CLOUDFLARE_ANALYTICS_TOKEN`.
+`TODO_ADDRESS`, `TODO_FACEBOOK_URL`, `TODO_INSTAGRAM_URL`,
+`TODO_LATITUDE` / `TODO_LONGITUDE`, `TODO_CLOUDFLARE_ANALYTICS_TOKEN`, and
+`TODO_INN_SITE_URL` — the Hibiscus Coral Inn site's address, once it is live.
 
 The site currently builds against `https://hibiscus-dive-inn.pages.dev`. When the
 custom domain is ready, change `SITE_URL` in `astro.config.mjs` — it is marked
@@ -123,7 +126,7 @@ loads no third-party scripts at all and needs no cookie banner.
 
 ### 2. Prices, times and dive data — `src/content/`
 
-Room rates, course prices, the bus journey time and fare, the bus and ferry
+Course prices, the bus journey time and fare, the bus and ferry
 timetables, dive site names, depths, difficulties, boat times, what you see at
 each site, the certifying agency, and the instructor's name, certifications and
 bio.
@@ -140,19 +143,16 @@ components, so a text change is a one-file edit.
 
 ```
 src/content/
-  rooms/                 one file per room
-    single.md
-    double.md
-    four-person.md
   dive-sites/            one file per dive site
   courses/               one file per course or dive type
   pages/
-    about.md             homepage "About" section
-    diving-teaser.md     homepage diving section
-    getting-here.md      the journey, including bus and ferry times
-    diving-intro.md      /diving header
+    diving-intro.md      the page header
     equipment.md         what is provided, what to bring
     instructor.md        the instructor's bio and certifications
+    getting-here.md      the journey, including bus and ferry times
+    stay.md              the short Hibiscus Coral Inn note
+
+src/config/nav.ts        the menu entries and their order
 ```
 
 Each file has a block of settings at the top between `---` lines, then the body
@@ -160,12 +160,11 @@ text underneath. Changing the body text is safe. If you change a setting name or
 delete one, `npm run check` will tell you exactly what broke rather than the site
 quietly rendering wrong.
 
-Prices, ordering and photo filenames are all settings in those blocks. Room and
-course order on the page is controlled by the `order:` number — lower first.
+Prices, ordering and photo filenames are all settings in those blocks. Dive site
+and course order on the page is controlled by the `order:` number — lower first.
 
-The rooms are accordions and the course pathway (Open Water → Advanced Open
-Water) is declared by `followsFrom:` in `advanced.md`, so the link between them
-survives renaming.
+The course pathway (Open Water → Advanced Open Water) is declared by
+`followsFrom:` in `advanced.md`, so the link between them survives renaming.
 
 ---
 
@@ -181,22 +180,16 @@ overwrites a real photo.
 
 The list below is the source of truth (it mirrors `src/config/images.ts`).
 
-| File                       | Size        | What it should show                                                                                                                                    |
-| -------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `hero.jpg`                 | 2400 × 1600 | ✅ Sunset swim off the beach. A shot of the inn or the shoreline in front of it would be better still. Landscape; the name sits bottom-left             |
-| `room-single.jpg`          | 1600 × 1200 | The single room, from the doorway, bed and window in frame                                                                                             |
-| `room-double.jpg`          | 1600 × 1200 | The double room, from the doorway so the whole room reads in one frame                                                                                 |
-| `room-four-person.jpg`     | 1600 × 1200 | The four-person room, wide enough to show all the beds                                                                                                 |
-| `diving-teaser.jpg`        | 1600 × 1000 | ✅ Diver beside a sea fan. Underwater, darker and bluer is better — it carries the transition into the dark half of the site                            |
-| `diving-header.jpg`        | 2400 × 1400 | ✅ Diver silhouetted against the sun. Wide, deep blue, ideally a diver for scale                                                                        |
-| `dive-site-house-reef.jpg` | 1600 × 1200 | The house reef underwater — coral, fish, whatever is characteristic                                                                                    |
-| `dive-site-two.jpg`        | 1600 × 1200 | The second dive site. Rename the file once the site has a name                                                                                         |
-| `dive-site-three.jpg`      | 1600 × 1200 | The third dive site. Rename the file once the site has a name                                                                                          |
-| `instructor.jpg`           | 1200 × 1500 | Portrait of the instructor. A real photo of a person, not stock — this relationship is what guests are buying. Portrait orientation                    |
+| File                       | Size        | What it should show                                                                                                                 |
+| -------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `diving-header.jpg`        | 2400 × 1400 | ✅ Diver silhouetted against the sun. Wide, deep blue, ideally a diver for scale                                                    |
+| `dive-site-house-reef.jpg` | 1600 × 1200 | The house reef underwater — coral, fish, whatever is characteristic                                                                 |
+| `dive-site-two.jpg`        | 1600 × 1200 | The second dive site. Rename the file once the site has a name                                                                      |
+| `dive-site-three.jpg`      | 1600 × 1200 | The third dive site. Rename the file once the site has a name                                                                       |
+| `instructor.jpg`           | 1200 × 1500 | Portrait of the instructor. A real photo of a person, not stock — this relationship is what guests are buying. Portrait orientation |
 
-Social sharing cards live in `public/` at 1200 × 630: `og-default.png` and
-`og-diving.png`. They are crops of the hero and diving header photos — redo
-them if either of those changes.
+The social sharing card is `public/og-default.png` at 1200 × 630. It is a
+placeholder for now; replace it with a crop of the header photo.
 
 ---
 
@@ -206,11 +199,11 @@ You do not need to touch any of the above. Send Daniel:
 
 **Photos.** The originals, straight off the camera or phone — do not resize,
 crop or compress them first. Bigger is genuinely better; they get shrunk
-automatically. Say which room or dive site each one is of. The list of what is
+automatically. Say which dive site each one is of. The list of what is
 needed is the table above.
 
 **Text.** Just write it in an email or a message, saying which part of the site
-it belongs to ("the About bit", "the Open Water course"). It does not need
+it belongs to ("the equipment bit", "the Open Water course"). It does not need
 formatting.
 
 **Prices, times and fares.** These are the ones actually holding up launch. For
@@ -228,7 +221,8 @@ as an obvious placeholder, and the site refuses to publish while any remain.
 
 ## How it is put together
 
-- **`src/config/site.ts`** — contact details, both WhatsApp numbers, metadata
+- **`src/config/site.ts`** — contact details, the WhatsApp number, the inn link, metadata
+- **`src/config/nav.ts`** — the menu
 - **`src/config/images.ts`** — the photo manifest above
 - **`src/config/depths.ts`** — the depth rail's tick positions
 - **`src/content.config.ts`** — the rules each content file must follow
@@ -236,8 +230,12 @@ as an obvious placeholder, and the site refuses to publish while any remain.
 - **`src/components/`** — layout and page sections
 - **`src/integrations/placeholder-guard.ts`** — what fails the build
 
-The design runs on depth: the homepage sits at the surface in sand tones, and
-`/diving` is submerged in dark blue. The depth rail down the left edge marks how
-far you have descended. It is decoration with meaning, hidden below 360px wide,
-and switched off entirely under `prefers-reduced-motion`. It is never the only
-way to reach a section.
+The design runs on depth: the page starts at the surface and descends in dark
+blue. The depth rail down the left edge marks how far you have gone. It is
+decoration with meaning, hidden below 360px wide, and static under
+`prefers-reduced-motion`. The menu, not the rail, is how sections are reached;
+it shows each section's depth so the two read together, and it opens beside the
+rail rather than over it.
+
+`/diving` was the old address of this content and now redirects to `/` through
+`public/_redirects`.

@@ -1,7 +1,6 @@
 /**
  * Verifies every foreground/background pairing the site actually uses against
- * WCAG 2.1 AA. The brief says to verify contrast rather than assume it, and
- * --signal in particular is a trap: it is unusable as text on sand.
+ * WCAG 2.1 AA. The brief says to verify contrast rather than assume it.
  *
  * Run with `npm run check:contrast`.
  */
@@ -14,11 +13,6 @@ const PALETTE = {
 	shell: '#F6F2EA',
 	signal: '#FFA83C',
 	// Derived tokens from tokens.css
-	'surface/bg-sunk': '#D0C6B3',
-	'surface/fg-muted': '#43525A',
-	'surface/rule': '#B5A992',
-	'surface/rail-tick': '#5E6C75',
-	'surface/cta-hover': '#F09420',
 	'deep/bg-raised': '#0E2F42',
 	'deep/bg-sunk': '#05161F',
 	'deep/fg-muted': '#A9C2CC',
@@ -29,26 +23,6 @@ const PALETTE = {
 
 /** Text pairings: [foreground, background, label, minimum ratio] */
 const PAIRS = [
-	// --- surface theme (homepage) ---
-	['abyss', 'sand', 'body text', 4.5],
-	['abyss', 'shell', 'text on cards', 4.5],
-	['surface/fg-muted', 'sand', 'muted text', 4.5],
-	['surface/fg-muted', 'shell', 'muted text on cards', 4.5],
-	/*
-	 * The sunk surface is darker than the page background and is easy to
-	 * forget — the rooms section sits on it. Lighthouse caught a real failure
-	 * here that this file had not been testing.
-	 */
-	['surface/fg-muted', 'surface/bg-sunk', 'muted text on the sunk surface', 4.5],
-	['midwater', 'surface/bg-sunk', 'links on the sunk surface', 4.5],
-	['surface/rail-tick', 'surface/bg-sunk', 'rail ticks over the sunk surface', 3],
-	['midwater', 'sand', 'links', 4.5],
-	['midwater', 'shell', 'links on cards', 4.5],
-	['abyss', 'signal', 'CTA label on amber fill', 4.5],
-	['abyss', 'surface/cta-hover', 'CTA label, hovered', 4.5],
-	['abyss', 'surface/bg-sunk', 'text on sunk surface', 4.5],
-
-	// --- deep theme (/diving) ---
 	['shell', 'abyss', 'body text', 4.5],
 	['shell', 'deep/bg-raised', 'text on cards', 4.5],
 	['deep/fg-muted', 'abyss', 'muted text', 4.5],
@@ -65,8 +39,6 @@ const PAIRS = [
 	['abyss', 'deep/cta-hover', 'CTA label, hovered', 4.5],
 
 	// --- non-text: focus rings and borders need 3:1 ---
-	['abyss', 'sand', 'focus ring on page', 3],
-	['abyss', 'shell', 'focus ring on cards', 3],
 	['signal', 'abyss', 'focus ring on page', 3],
 	['signal', 'deep/bg-raised', 'focus ring on cards', 3],
 
@@ -75,8 +47,8 @@ const PAIRS = [
 	 * headings, so WCAG 1.4.3 does not bind, but they still have to be
 	 * legible — held to the 3:1 non-text bar.
 	 */
-	['surface/rail-tick', 'sand', 'rail depth ticks', 3],
 	['deep/rail-tick', 'abyss', 'rail depth ticks', 3],
+	['deep/rail-tick', 'deep/bg-raised', 'depths beside menu entries', 3],
 ];
 
 /**
@@ -84,13 +56,13 @@ const PAIRS = [
  * graphics; a divider that carries no information is exempt. Reported so a
  * change that makes one invisible is at least visible here.
  */
-const DECORATIVE = [
-	['surface/rule', 'sand', 'hairline rule'],
-	['deep/rule', 'abyss', 'hairline rule'],
-];
+const DECORATIVE = [['deep/rule', 'abyss', 'hairline rule']];
 
 /** Pairings that must NOT be used. Guards against regressions. */
-const FORBIDDEN = [['signal', 'sand', '--signal as text or hairline on the homepage']];
+const FORBIDDEN = [
+	// Amber reads as text only on dark water; sand is kept to guard the rule.
+	['signal', 'sand', '--signal as text or a hairline on a light background'],
+];
 
 function toLinear(channel) {
 	const c = channel / 255;

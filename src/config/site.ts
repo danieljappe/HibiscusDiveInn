@@ -7,18 +7,16 @@
  */
 
 export const SITE = {
-	name: 'Hibiscus Coral Inn',
+	name: 'Island Divers',
 	/** Used in <title> after the page name. */
-	shortName: 'Hibiscus Coral Inn',
-	tagline: 'A small inn on Bantayan Island',
-	/** The line under the name in the hero. */
-	lede: 'A handful of quiet rooms, a short walk from the water.',
+	shortName: 'Island Divers',
+	tagline: 'Diving on Bantayan Island',
 	/** Canonical origin, no trailing slash. Set before launch. */
 	url: 'TODO_SITE_URL',
 	locale: 'en',
 	region: 'PH',
 	description:
-		'A small, owner-run inn on Bantayan Island, Cebu. Simple, quiet rooms a short walk from the water, with diving next door through Island Divers.',
+		'Island Divers: small-group diving and dive courses on Bantayan Island, Cebu, with a house reef you can walk into and one instructor.',
 	/** Geo-targeting for search. */
 	place: {
 		island: 'Bantayan Island',
@@ -29,38 +27,26 @@ export const SITE = {
 	},
 } as const;
 
-/**
- * The dive centre is a separate business with the same owners. The rooms are
- * the inn's product; diving is offered alongside through Island Divers. It
- * may get its own site later — until then it lives at /diving on this one.
- */
-export const DIVE_CENTRE = {
-	name: 'Island Divers',
-	/** Google Maps listing, which carries the dive centre's reviews. */
-	reviewsUrl: 'https://maps.app.goo.gl/c6YD1M7N8WPJANvx8',
-} as const;
-
-/**
- * Two WhatsApp lines. The inn number handles rooms and general enquiries; the
- * dive number handles courses and dive questions. Digits only, no `+`.
- */
+/** Digits only for WhatsApp, no `+`. */
 export const CONTACT = {
-	whatsappInn: '639773284208',
-	whatsappDive: '639398450270',
+	whatsapp: '639398450270',
 	email: 'TODO_EMAIL',
 	address: 'TODO_ADDRESS',
-	mapsUrl: 'TODO_MAPS_URL',
+	/** Island Divers' Google Maps listing, which also carries its reviews. */
+	mapsUrl: 'https://maps.app.goo.gl/c6YD1M7N8WPJANvx8',
 	facebook: 'TODO_FACEBOOK_URL',
 	instagram: 'TODO_INSTAGRAM_URL',
 } as const;
 
-export type ContactChannel = 'inn' | 'dive';
-
-/** Resolves a channel to its number and the label shown next to it. */
-export const CHANNELS = {
-	inn: { number: CONTACT.whatsappInn, label: 'the inn' },
-	dive: { number: CONTACT.whatsappDive, label: DIVE_CENTRE.name },
-} as const satisfies Record<ContactChannel, { number: string; label: string }>;
+/**
+ * The owners' inn. It is a separate business with its own site, and this one
+ * points to it once, for divers who need somewhere to stay.
+ */
+export const INN = {
+	name: 'Hibiscus Coral Inn',
+	/** The rooms site. Not live yet. */
+	url: 'TODO_INN_SITE_URL',
+} as const;
 
 /**
  * Cloudflare Web Analytics is cookieless, so no consent banner is needed.
@@ -72,26 +58,13 @@ export const ANALYTICS = {
 } as const;
 
 /**
- * Prefilled enquiry templates.
- *
- * The whole point is that the owner receives a structured enquiry rather than
- * "hi is it free?". `inn` is the default from the brief; `dive` is its
- * equivalent for Island Divers' line.
+ * The prefilled enquiry. The whole point is that the owner receives a
+ * structured enquiry rather than "hi is it free?".
  */
-export const ENQUIRY_TEMPLATES = {
-	inn: [
-		`Hi ${SITE.name}! I'd like to ask about a stay.`,
-		'',
-		'Dates:',
-		'Guests:',
-		'Diving: certified / not certified / want to learn',
-	].join('\n'),
-
-	dive: [
-		`Hi ${DIVE_CENTRE.name}! I'd like to ask about diving.`,
-		'',
-		'Dates:',
-		'Divers:',
-		'Experience: certified / not certified / want to learn',
-	].join('\n'),
-} as const satisfies Record<ContactChannel, string>;
+export const ENQUIRY_TEMPLATE = [
+	`Hi ${SITE.name}! I'd like to ask about diving.`,
+	'',
+	'Dates:',
+	'Divers:',
+	'Experience: certified / not certified / want to learn',
+].join('\n');

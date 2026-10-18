@@ -1,0 +1,62 @@
+---
+/**
+ * The one pointer to the owners' inn, for divers who need a bed. Deliberately
+ * small: the inn has its own site, and this one is about the diving.
+ */
+import { render } from 'astro:content';
+import { requirePage } from '../lib/content';
+import Placeholder from './primitives/Placeholder.astro';
+import { INN } from '../config/site';
+import { isPlaceholder } from '../lib/placeholders';
+
+const entry = await requirePage('stay');
+const { Content } = await render(entry);
+---
+
+<aside class="inn-note" aria-labelledby="inn-note-heading">
+	<h3 class="inn-note__heading" id="inn-note-heading">{entry.data.title}</h3>
+	<div class="inn-note__body prose">
+		<Content />
+	</div>
+	{
+		isPlaceholder(INN.url) ? (
+			<p class="inn-note__link">
+				{INN.name} <Placeholder value={INN.url} />
+			</p>
+		) : (
+			<a class="inn-note__link" href={INN.url} rel="noopener">
+				Visit {INN.name} <span aria-hidden="true">&rarr;</span>
+			</a>
+		)
+	}
+</aside>
+
+<style>
+	.inn-note {
+		max-width: 56rem;
+		margin-block-start: var(--space-lg);
+		padding: var(--space-md);
+		border: 1px solid var(--rule);
+		border-radius: var(--radius-lg);
+	}
+
+	.inn-note__heading {
+		font-size: var(--text-lg);
+	}
+
+	.inn-note__body {
+		margin-block-start: var(--space-2xs);
+		color: var(--fg-muted);
+	}
+
+	.inn-note__link {
+		display: inline-flex;
+		flex-wrap: wrap;
+		gap: var(--space-2xs);
+		align-items: center;
+		/* 44px tap target. */
+		min-height: 44px;
+		margin-block-start: var(--space-2xs);
+		font-weight: var(--weight-medium);
+	}
+</style>

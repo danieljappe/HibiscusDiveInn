@@ -3,9 +3,8 @@
  *
  * The rail is decoration with meaning: each page section is pinned to a depth,
  * and the rail's marker descends as the visitor scrolls. Depths are authored
- * here rather than in components so they can be retuned in one file.
- *
- * The rail only appears on /diving; the homepage stays at the surface.
+ * here rather than in components so they can be retuned in one file. The menu
+ * shows the same depths beside each section, so the two always agree.
  */
 
 export type DepthTick = {
@@ -18,31 +17,31 @@ export type DepthTick = {
 };
 
 /**
- * `/diving` continues from -12m, where the homepage teaser sat.
- *
  * Dive site ticks are spaced evenly between DIVE_SITE_RANGE until real depth
  * data exists. This spacing is a design choice, not measured data — once a
  * site's `depthMaxM` is filled in, the rail sorts and positions by that
- * instead. See `raildepthsForSites`.
+ * instead. See `railDepthsForSites`.
  */
-export const DIVE_SITE_RANGE = { shallowest: 14, deepest: 30 } as const;
+export const DIVE_SITE_RANGE = { shallowest: 6, deepest: 28 } as const;
 
-/**
- * The fixed sections of /diving. Dive site ticks are generated from the
- * collection and inserted between the intro and the courses — see
- * `railDepthsForSites`.
- */
-export const DIVING_INTRO_DEPTH: DepthTick = {
+/** The page header sits at the surface; the descent starts from here. */
+export const INTRO_DEPTH: DepthTick = {
 	id: 'diving-intro',
-	depth: 12,
-	label: 'Descent',
+	depth: 0,
+	label: 'Surface',
 };
 
-export const DIVING_TAIL_DEPTHS: readonly DepthTick[] = [
+/**
+ * The fixed sections below the dive sites. Dive site ticks are generated from
+ * the collection and inserted between the intro and these — see
+ * `railDepthsForSites`.
+ */
+export const TAIL_DEPTHS: readonly DepthTick[] = [
 	{ id: 'courses', depth: 32, label: 'Courses' },
 	{ id: 'equipment', depth: 36, label: 'Equipment' },
 	{ id: 'instructor', depth: 40, label: 'Instructor' },
-	{ id: 'dive-contact', depth: 44, label: 'Get in touch' },
+	{ id: 'getting-here', depth: 44, label: 'Getting here' },
+	{ id: 'dive-contact', depth: 48, label: 'Get in touch' },
 ];
 
 /**

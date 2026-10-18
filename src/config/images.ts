@@ -26,55 +26,13 @@ export type ImageSpec = {
 
 export const IMAGE_MANIFEST: readonly ImageSpec[] = [
 	{
-		file: 'hero.jpg',
-		width: 2400,
-		height: 1600,
-		placeholderColour: '#1A5A6E',
-		brief:
-			'The strongest single photo of the place — currently a sunset swim off the beach. A shot of the inn itself or the shoreline in front of it would be better still. Landscape, shot wide; the name sits over the bottom-left.',
-		usedOn: 'Homepage hero',
-	},
-	{
-		file: 'room-single.jpg',
-		width: 1600,
-		height: 1200,
-		placeholderColour: '#6FB3B0',
-		brief: 'The single room, shot from the doorway with the bed and the window in frame.',
-		usedOn: 'Homepage, rooms section',
-	},
-	{
-		file: 'room-double.jpg',
-		width: 1600,
-		height: 1200,
-		placeholderColour: '#4E8F94',
-		brief: 'The double room, shot from the doorway so the whole room reads in one frame.',
-		usedOn: 'Homepage, rooms section',
-	},
-	{
-		file: 'room-four-person.jpg',
-		width: 1600,
-		height: 1200,
-		placeholderColour: '#2E6E7E',
-		brief: 'The four-person room, wide enough to show all the beds.',
-		usedOn: 'Homepage, rooms section',
-	},
-	{
-		file: 'diving-teaser.jpg',
-		width: 1600,
-		height: 1000,
-		placeholderColour: '#0E2F42',
-		brief:
-			'An underwater photo with a diver in it. This one carries the transition into the dark half of the site, so darker and bluer is better than bright and sunny.',
-		usedOn: 'Homepage, diving teaser',
-	},
-	{
 		file: 'diving-header.jpg',
 		width: 2400,
 		height: 1400,
 		placeholderColour: '#08202E',
 		brief:
-			'The best underwater photo you have — wide, deep blue, ideally with a diver for scale. It sits behind the heading at the top of the diving page.',
-		usedOn: '/diving header',
+			'The best underwater photo you have — wide, deep blue, ideally with a diver for scale. It sits behind the heading at the top of the page.',
+		usedOn: 'Page header',
 	},
 	{
 		file: 'dive-site-house-reef.jpg',
@@ -82,7 +40,7 @@ export const IMAGE_MANIFEST: readonly ImageSpec[] = [
 		height: 1200,
 		placeholderColour: '#1A5A6E',
 		brief: 'The house reef underwater — coral, fish, whatever is characteristic of it.',
-		usedOn: '/diving, dive sites',
+		usedOn: 'Dive sites',
 	},
 	{
 		file: 'dive-site-two.jpg',
@@ -90,7 +48,7 @@ export const IMAGE_MANIFEST: readonly ImageSpec[] = [
 		height: 1200,
 		placeholderColour: '#16495C',
 		brief: 'The second dive site. Rename the file once the site has a name.',
-		usedOn: '/diving, dive sites',
+		usedOn: 'Dive sites',
 	},
 	{
 		file: 'dive-site-three.jpg',
@@ -98,7 +56,7 @@ export const IMAGE_MANIFEST: readonly ImageSpec[] = [
 		height: 1200,
 		placeholderColour: '#123A4A',
 		brief: 'The third dive site. Rename the file once the site has a name.',
-		usedOn: '/diving, dive sites',
+		usedOn: 'Dive sites',
 	},
 	{
 		file: 'instructor.jpg',
@@ -107,7 +65,7 @@ export const IMAGE_MANIFEST: readonly ImageSpec[] = [
 		placeholderColour: '#2E6E7E',
 		brief:
 			'A portrait of the instructor. A real photo of a person, not a stock image — this relationship is what guests are actually buying. Portrait orientation.',
-		usedOn: '/diving, instructor section',
+		usedOn: 'Instructor section',
 	},
 ];
 

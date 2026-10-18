@@ -34,7 +34,7 @@ const span = Math.max(deepest - shallowest, 1);
 /**
  * Position down the rail, 0-100%, proportional to depth. The scale runs from
  * the page's own shallowest tick, so the first tick sits at the top of the
- * rail where the marker starts — /diving begins at -12m, not at the surface.
+ * rail where the marker starts.
  */
 const positionOf = (tick: DepthTick) => ((tick.depth - shallowest) / span) * 100;
 
@@ -153,11 +153,7 @@ const generatedCss = `
 		}
 	</ol>
 
-	<div
-		class="rail__marker"
-		data-rail-marker
-		data-positions={JSON.stringify(ticks.map(positionOf))}
-	>
+	<div class="rail__marker" data-rail-marker data-positions={JSON.stringify(ticks.map(positionOf))}>
 	</div>
 </aside>
 

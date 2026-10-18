@@ -1,10 +1,10 @@
 ---
 /**
- * -44m, the deepest point of the site. Uses the dive centre's line with
- * diving context already prefilled.
+ * -48m, the deepest point of the site. WhatsApp with diving context already
+ * prefilled, then the phone and email fallbacks.
  */
 import ContactMethods from '../../ContactMethods.astro';
-import { DIVE_CENTRE } from '../../../config/site';
+import { SITE, CONTACT } from '../../../config/site';
 ---
 
 <section class="section dive-contact" id="dive-contact" aria-labelledby="dive-contact-heading">
@@ -12,22 +12,18 @@ import { DIVE_CENTRE } from '../../../config/site';
 		<p class="eyebrow">Get in touch</p>
 		<h2 id="dive-contact-heading">Tell us what you want to dive</h2>
 		<p class="dive-contact__lede prose">
-			Message {DIVE_CENTRE.name} directly. Say whether you are certified, roughly when you are coming,
-			and how many of you there are — that is enough for us to tell you what is possible.
+			Message {SITE.name} directly. Say whether you are certified, roughly when you are coming, and how
+			many of you there are — that is enough for us to tell you what is possible.
 		</p>
 
 		<div class="dive-contact__cta">
-			<ContactMethods channel="dive" label="Ask about diving" align="start" />
+			<ContactMethods label="Ask about diving" align="start" />
 		</div>
 
 		<p class="dive-contact__alt">
-			Read what other divers say <a href={DIVE_CENTRE.reviewsUrl} rel="noopener" target="_blank"
+			Read what other divers say <a href={CONTACT.mapsUrl} rel="noopener" target="_blank"
 				>in our Google reviews</a
 			>.
-		</p>
-
-		<p class="dive-contact__alt">
-			Asking about a room as well? <a href="/#contact">The inn has its own number</a>.
 		</p>
 	</div>
 </section>

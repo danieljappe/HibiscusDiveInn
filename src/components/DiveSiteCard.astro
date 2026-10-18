@@ -62,6 +62,8 @@ const headingId = `dive-site-${id}`;
 <style>
 	.site {
 		display: grid;
+		/* minmax(0, …) so a long unbroken value cannot push the card past a 360px screen. */
+		grid-template-columns: minmax(0, 1fr);
 		gap: var(--space-md);
 		padding: var(--space-md);
 		background-color: var(--bg-raised);
@@ -119,7 +121,7 @@ const headingId = `dive-site-${id}`;
 
 	@media (min-width: 768px) {
 		.site {
-			grid-template-columns: 2fr 3fr;
+			grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
 			gap: var(--space-lg);
 			padding: var(--space-lg);
 			align-items: start;

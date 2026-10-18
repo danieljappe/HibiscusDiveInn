@@ -1,47 +1,110 @@
 ---
 /**
- * Minimal chrome. Two pages, so two links — the site is a scroll, not a
- * hierarchy, and the depth rail is decoration rather than navigation.
+ * Sticky header with the section menu.
+ *
+ * Mobile-first: below 1200px the sections sit behind a menu button, and from
+ * 1200px they are laid out inline. The menu is a <details> element, so it opens
+ * and closes with JavaScript disabled; the few lines of script below only add
+ * closing it after a link is chosen, on Escape, and on a tap outside.
+ *
+ * The open panel starts to the right of the depth rail rather than covering
+ * it, and each entry carries its section's depth in the same mono the rail
+ * uses, so the menu reads as a key to the rail. The rail is still decoration:
+ * this menu, not the rail, is how sections are reached.
  */
-import { SITE } from '../config/site';
+import WhatsAppLink from './WhatsAppLink.astro';
+import { SITE, INN } from '../config/site';
+import type { NavItem } from '../config/nav';
+import { isPlaceholder } from '../lib/placeholders';
 
 interface Props {
-	/** Marks the current page for aria-current. */
-	current: 'home' | 'diving';
+	nav: readonly NavItem[];
 }
 
-const { current } = Astro.props;
+const { nav } = Astro.props;
+
+const depthLabel = (depth?: number) =>
+	depth === undefined ? undefined : depth === 0 ? '0m' : `-${depth}m`;
 ---
 
 <header class="site-header">
-	<nav class="site-header__inner container" aria-label="Main">
-		<a class="site-header__brand" href="/" aria-current={current === 'home' ? 'page' : undefined}>
-			{SITE.name}
-		</a>
+	<div class="site-header__inner container">
+		<a class="site-header__brand" href="/">{SITE.name}</a>
 
-		<ul class="site-header__links">
-			<li>
-				<a href="/" aria-current={current === 'home' ? 'page' : undefined}>Stay</a>
-			</li>
-			<li>
-				<a href="/diving" aria-current={current === 'diving' ? 'page' : undefined}>Diving</a>
-			</li>
-		</ul>
-	</nav>
+		<nav class="site-header__inline" aria-label="Sections">
+			<ul>
+				{
+					nav.map((item) => (
+						<li>
+							<a href={`#${item.id}`}>{item.label}</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
+
+		<details class="menu" data-menu>
+			<summary class="menu__button">
+				<span class="menu__icon" aria-hidden="true"><span></span></span>
+				<span class="menu__button-label">Menu</span>
+			</summary>
+
+			<div class="menu__panel">
+				<nav aria-label="Sections">
+					<ol class="menu__list">
+						{
+							nav.map((item) => (
+								<li>
+									<a class="menu__link" href={`#${item.id}`}>
+										<span>{item.label}</span>
+										{item.depth !== undefined && (
+											<span class="menu__depth" aria-hidden="true">
+												{depthLabel(item.depth)}
+											</span>
+										)}
+									</a>
+								</li>
+							))
+						}
+					</ol>
+				</nav>
+
+				<div class="menu__footer">
+					<WhatsAppLink label="Ask about diving" />
+					{
+						!isPlaceholder(INN.url) && (
+							<a class="menu__inn" href={INN.url} rel="noopener">
+								Staying over? {INN.name} <span aria-hidden="true">&rarr;</span>
+							</a>
+						)
+					}
+				</div>
+			</div>
+		</details>
+	</div>
 </header>
 
 <style>
 	.site-header {
-		position: relative;
-		z-index: 2;
-		padding-block: var(--space-sm);
+		position: sticky;
+		top: 0;
+		/* Above the depth rail, which sits at 3. */
+		z-index: 4;
+		padding-block: var(--header-padding);
 		/* Clear the depth rail. */
 		padding-inline-start: var(--rail-width);
+		background-color: var(--header-bg);
+		border-block-end: 1px solid var(--rule);
+	}
+
+	@supports (backdrop-filter: blur(1px)) {
+		.site-header {
+			backdrop-filter: blur(10px);
+		}
 	}
 
 	.site-header__inner {
 		display: flex;
-		flex-wrap: wrap;
 		gap: var(--space-sm);
 		align-items: center;
 		justify-content: space-between;
@@ -60,7 +123,13 @@ const { current } = Astro.props;
 		text-decoration: none;
 	}
 
-	.site-header__links {
+	/* ---- Inline links, 1200px and up -------------------------------------- */
+
+	.site-header__inline {
+		display: none;
+	}
+
+	.site-header__inline ul {
 		display: flex;
 		gap: var(--space-sm);
 		margin: 0;
@@ -68,10 +137,9 @@ const { current } = Astro.props;
 		list-style: none;
 	}
 
-	.site-header__links a {
+	.site-header__inline a {
 		display: inline-flex;
 		align-items: center;
-		/* 44px tap target. */
 		min-height: 44px;
 		padding-inline: var(--space-2xs);
 		font-size: var(--text-sm);
@@ -80,13 +148,228 @@ const { current } = Astro.props;
 		text-decoration: none;
 	}
 
-	.site-header__links a:hover {
+	.site-header__inline a:hover {
 		color: var(--fg);
 	}
 
-	.site-header__links a[aria-current='page'] {
+	/* ---- Menu button ------------------------------------------------------ */
+
+	.menu__button {
+		display: inline-flex;
+		gap: var(--space-2xs);
+		align-items: center;
+		/* 44px tap target, square enough to hit with a thumb. */
+		min-width: 44px;
+		min-height: 44px;
+		padding-inline: var(--space-xs);
+		border: 1px solid var(--rule);
+		border-radius: var(--radius-md);
+		font-size: var(--text-sm);
+		font-weight: var(--weight-medium);
 		color: var(--fg);
-		text-decoration: underline;
-		text-underline-offset: 0.35em;
+		cursor: pointer;
+		list-style: none;
+		user-select: none;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	.menu__button::-webkit-details-marker {
+		display: none;
+	}
+
+	.menu__button:hover {
+		border-color: var(--fg-muted);
+	}
+
+	/* Three lines, crossing into an X while open. */
+	.menu__icon,
+	.menu__icon::before,
+	.menu__icon::after,
+	.menu__icon span {
+		display: block;
+		width: 18px;
+		height: 2px;
+		border-radius: 1px;
+		background-color: currentColor;
+	}
+
+	.menu__icon {
+		position: relative;
+		background-color: transparent;
+	}
+
+	.menu__icon::before,
+	.menu__icon::after {
+		content: '';
+		position: absolute;
+		inset-inline-start: 0;
+		transition: transform var(--duration-base) var(--ease-out);
+	}
+
+	.menu__icon::before {
+		top: -6px;
+	}
+
+	.menu__icon::after {
+		top: 6px;
+	}
+
+	.menu__icon span {
+		transition: opacity var(--duration-fast) var(--ease-out);
+	}
+
+	.menu[open] .menu__icon::before {
+		transform: translateY(6px) rotate(45deg);
+	}
+
+	.menu[open] .menu__icon::after {
+		transform: translateY(-6px) rotate(-45deg);
+	}
+
+	.menu[open] .menu__icon span {
+		opacity: 0;
+	}
+
+	/* ---- Menu panel ------------------------------------------------------- */
+
+	/*
+	 * Anchored to the header, full width minus the depth rail: the rail stays
+	 * visible down the left edge while the menu is open, so the depths beside
+	 * each entry can be read against it.
+	 */
+	.menu__panel {
+		position: absolute;
+		inset-block-start: 100%;
+		inset-inline: var(--rail-width) 0;
+		max-height: calc(100svh - var(--header-height));
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		padding: var(--space-2xs) var(--gutter) var(--space-lg);
+		background-color: var(--bg-raised);
+		border-block-end: 1px solid var(--rule);
+		box-shadow: 0 16px 32px rgb(0 0 0 / 0.35);
+	}
+
+	/*
+	 * Chrome still lays out a closed <details>' content, squeezed into the
+	 * summary's width, and that overflow made the page scroll sideways on
+	 * phones. Taking the panel out of layout while closed stops it.
+	 */
+	.menu:not([open]) .menu__panel {
+		display: none;
+	}
+
+	.menu__list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.menu__list li + li {
+		border-block-start: 1px solid var(--rule);
+	}
+
+	.menu__link {
+		display: flex;
+		gap: var(--space-sm);
+		align-items: center;
+		justify-content: space-between;
+		/* Generous rows: this is mostly used with a thumb. */
+		min-height: 52px;
+		font-family: var(--font-display);
+		font-size: var(--text-xl);
+		font-weight: var(--weight-semibold);
+		letter-spacing: var(--tracking-display-loose);
+		color: var(--fg);
+		text-decoration: none;
+	}
+
+	.menu__link:hover {
+		color: var(--link-hover);
+	}
+
+	.menu__depth {
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		font-weight: var(--weight-normal);
+		letter-spacing: var(--tracking-mono);
+		font-variant-numeric: tabular-nums;
+		color: var(--rail-tick);
+	}
+
+	.menu__footer {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-xs);
+		align-items: stretch;
+		margin-block-start: var(--space-md);
+	}
+
+	.menu__inn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 44px;
+		font-size: var(--text-sm);
+		font-weight: var(--weight-medium);
+	}
+
+	@media (min-width: 768px) {
+		/* A dropdown rather than a sheet once there is room either side. */
+		.menu__panel {
+			inset-inline: auto var(--gutter);
+			width: 22rem;
+			border: 1px solid var(--rule);
+			border-radius: var(--radius-lg);
+		}
+	}
+
+	@media (min-width: 1200px) {
+		.site-header__inline {
+			display: block;
+		}
+
+		.menu {
+			display: none;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.menu__icon::before,
+		.menu__icon::after,
+		.menu__icon span {
+			transition: none;
+		}
 	}
 </style>
+
+<script is:inline>
+	/*
+	 * Progressive enhancement only: the menu already opens and closes without
+	 * this. It closes the menu once a section is chosen, so the panel is not
+	 * left covering the section the visitor jumped to, and on Escape or a tap
+	 * outside.
+	 */
+	(function () {
+		var menu = document.querySelector('[data-menu]');
+		if (!menu) return;
+
+		function close(returnFocus) {
+			if (!menu.open) return;
+			menu.open = false;
+			if (returnFocus) menu.querySelector('summary').focus();
+		}
+
+		menu.addEventListener('click', function (event) {
+			if (event.target.closest('a')) close(false);
+		});
+
+		document.addEventListener('keydown', function (event) {
+			if (event.key === 'Escape') close(true);
+		});
+
+		document.addEventListener('click', function (event) {
+			if (!menu.contains(event.target)) close(false);
+		});
+	})();
+</script>

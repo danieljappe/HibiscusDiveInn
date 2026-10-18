@@ -1,17 +1,7 @@
 ---
 import Placeholder from './primitives/Placeholder.astro';
-import { SITE, CONTACT } from '../config/site';
+import { SITE, CONTACT, INN } from '../config/site';
 import { isPlaceholder } from '../lib/placeholders';
-
-interface Props {
-	/**
-	 * The footer sits below the deepest section on both pages, so it stays
-	 * dark — reverting to sand here would undo the descent.
-	 */
-	theme?: 'surface' | 'deep';
-}
-
-const { theme = 'deep' } = Astro.props;
 
 const year = new Date().getFullYear();
 
@@ -21,7 +11,7 @@ const socials = [
 ];
 ---
 
-<footer class="site-footer" data-theme={theme}>
+<footer class="site-footer">
 	<div class="container site-footer__inner">
 		<p class="site-footer__name">{SITE.name}</p>
 
@@ -47,6 +37,21 @@ const socials = [
 				))
 			}
 		</ul>
+
+		<p class="site-footer__inn">
+			Somewhere to stay:{' '}
+			{
+				isPlaceholder(INN.url) ? (
+					<>
+						{INN.name} <Placeholder value={INN.url} />
+					</>
+				) : (
+					<a href={INN.url} rel="noopener">
+						{INN.name}
+					</a>
+				)
+			}
+		</p>
 
 		<p class="site-footer__legal">&copy; {year} {SITE.name}</p>
 	</div>
@@ -86,6 +91,12 @@ const socials = [
 	}
 
 	.site-footer__socials a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 44px;
+	}
+
+	.site-footer__inn a {
 		display: inline-flex;
 		align-items: center;
 		min-height: 44px;

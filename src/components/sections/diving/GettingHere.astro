@@ -1,6 +1,6 @@
 ---
 /**
- * -20m. Bantayan is awkward to reach, and this is otherwise the most common
+ * -44m. Bantayan is awkward to reach, and this is otherwise the most common
  * question. The route is one direct bus that boards the ferry, so this is a
  * single leg rather than a numbered itinerary.
  *
@@ -10,6 +10,7 @@
 import { render } from 'astro:content';
 import { requirePage } from '../../../lib/content';
 import Stat from '../../primitives/Stat.astro';
+import InnNote from '../../InnNote.astro';
 import Placeholder from '../../primitives/Placeholder.astro';
 import { isPlaceholder } from '../../../lib/placeholders';
 
@@ -64,6 +65,8 @@ const schedules = entry.data.schedules ?? [];
 		<div class="prose journey__body">
 			<Content />
 		</div>
+
+		<InnNote />
 	</div>
 </section>
 

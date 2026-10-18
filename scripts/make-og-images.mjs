@@ -2,11 +2,11 @@
  * Generates the Open Graph / Twitter card images.
  *
  * These are placeholders like every other image here: palette colours and the
- * resort name, no photograph. They exist because a social card with no image
+ * dive centre's name, no photograph. They exist because a social card with no image
  * is worse than one with a plain one, and because the dimensions and file
  * names need to be settled before launch.
  *
- * Replace them with real 1200x630 crops of the hero and diving photographs
+ * Replace them with a real 1200x630 crop of the header photograph
  * once those arrive — same filenames, no code change.
  *
  * Run with `npm run images:og`.
@@ -25,21 +25,12 @@ const HEIGHT = 630;
 const cards = [
 	{
 		file: 'og-default.png',
-		background: '#DCD3C3',
-		ink: '#08202E',
-		muted: '#4A5A63',
-		rule: '#B5A992',
-		title: 'Hibiscus Coral Inn',
-		subtitle: 'Bantayan Island · Cebu · Philippines',
-	},
-	{
-		file: 'og-diving.png',
 		background: '#08202E',
 		ink: '#F6F2EA',
 		muted: '#A9C2CC',
 		rule: '#24505F',
-		title: 'Diving Bantayan',
-		subtitle: 'With Island Divers · House reef · Small groups',
+		title: 'Island Divers',
+		subtitle: 'Diving Bantayan Island · Cebu · Philippines',
 	},
 ];
 

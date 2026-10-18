@@ -3,19 +3,18 @@
  * The full contact trio: WhatsApp first, then the same number as a `tel:`
  * link, then email as a fallback for visitors without WhatsApp.
  *
- * Used at the section-level calls to action — hero, contact, and the diving
- * page. Room and course cards carry the WhatsApp deep link alone, since they
- * sit above a contact section that repeats all three.
+ * Used at the section-level call to action. Course cards carry the WhatsApp
+ * deep link alone, since they sit above a contact section that repeats all
+ * three.
  */
 import WhatsAppLink from './WhatsAppLink.astro';
 import Placeholder from './primitives/Placeholder.astro';
-import { CHANNELS, CONTACT, type ContactChannel } from '../config/site';
+import { CONTACT } from '../config/site';
 import { formatPhone, telHref } from '../lib/phone';
 import { mailtoHref } from '../lib/enquiry';
 import { isPlaceholder } from '../lib/placeholders';
 
 interface Props {
-	channel: ContactChannel;
 	context?: string;
 	label?: string;
 	variant?: 'primary' | 'ghost';
@@ -23,14 +22,14 @@ interface Props {
 	align?: 'start' | 'centre';
 }
 
-const { channel, context, label, variant = 'primary', align = 'start' } = Astro.props;
+const { context, label, variant = 'primary', align = 'start' } = Astro.props;
 
-const number = CHANNELS[channel].number;
+const number = CONTACT.whatsapp;
 const emailPending = isPlaceholder(CONTACT.email);
 ---
 
 <div class:list={['contact-methods', `contact-methods--${align}`]}>
-	<WhatsAppLink channel={channel} context={context} label={label} variant={variant} />
+	<WhatsAppLink context={context} label={label} variant={variant} />
 
 	<p class="contact-methods__alt">
 		or call <a class="contact-methods__link data" href={telHref(number)}>{formatPhone(number)}</a>
@@ -44,7 +43,7 @@ const emailPending = isPlaceholder(CONTACT.email);
 				<>
 					{' '}
 					—{' '}
-					<a class="contact-methods__link" href={mailtoHref(CONTACT.email, channel, context)}>
+					<a class="contact-methods__link" href={mailtoHref(CONTACT.email, context)}>
 						email us
 					</a>
 				</>

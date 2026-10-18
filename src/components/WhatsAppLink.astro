@@ -2,20 +2,16 @@
 /**
  * The site's primary call to action.
  *
- * Two lines exist: `inn` for rooms and general enquiries, `dive` for courses
- * and dive questions. The `context` prop prefills a subject line so a room
- * card or course entry arrives already identified.
+ * The `context` prop prefills a subject line so a course entry arrives
+ * already identified.
  *
- * Amber is only ever a filled background with abyss text — on the sand
- * homepage, --signal as a text or border colour is 1.3:1. The ghost variant
- * uses the foreground colour instead.
+ * Amber is only ever a filled background with abyss text, so the button reads
+ * the same on every surface. The ghost variant uses the foreground colour.
  */
 import { whatsappHref } from '../lib/enquiry';
-import type { ContactChannel } from '../config/site';
 
 interface Props {
-	channel: ContactChannel;
-	/** Prefilled subject, e.g. "the Garden Room". */
+	/** Prefilled subject, e.g. "the Open Water course". */
 	context?: string;
 	/** Visible label. */
 	label?: string;
@@ -23,28 +19,16 @@ interface Props {
 	class?: string;
 }
 
-const {
-	channel,
-	context,
-	label = 'Ask on WhatsApp',
-	variant = 'primary',
-	class: className,
-} = Astro.props;
+const { context, label = 'Ask on WhatsApp', variant = 'primary', class: className } = Astro.props;
 
-const href = whatsappHref(channel, context);
+const href = whatsappHref(context);
 /* The context is already in the visible label on cards, so only add it to the
    accessible name when it would otherwise be ambiguous. */
 const describedContext =
 	context && !label.toLowerCase().includes(context.toLowerCase().slice(0, 12));
 ---
 
-<a
-	class:list={['wa', `wa--${variant}`, className]}
-	href={href}
-	rel="noopener"
-	target="_blank"
-	data-channel={channel}
->
+<a class:list={['wa', `wa--${variant}`, className]} href={href} rel="noopener" target="_blank">
 	<svg class="wa__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
 		<path
 			fill="currentColor"

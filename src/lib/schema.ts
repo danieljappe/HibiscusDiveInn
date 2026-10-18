@@ -1,10 +1,10 @@
-import { SITE, CONTACT, CHANNELS, DIVE_CENTRE } from '../config/site';
+import { SITE, CONTACT } from '../config/site';
 import { isPlaceholder } from './placeholders';
 
 /**
  * Structured data.
  *
- * Google is how divers find this resort, so this is treated as a feature
+ * Google is how divers find the dive centre, so this is treated as a feature
  * rather than a chore. Unconfirmed values are omitted rather than emitted as
  * `TODO_` strings — publishing a placeholder as though it were data is worse
  * than publishing nothing, and a production build cannot ship placeholders
@@ -26,27 +26,6 @@ function clean<T extends Record<string, unknown>>(input: T): Partial<T> {
 const absolute = (path: string, site: URL | undefined) =>
 	site ? new URL(path, site).href : undefined;
 
-/** Both WhatsApp lines, described by what each one is for. */
-function contactPoints() {
-	return [
-		clean({
-			'@type': 'ContactPoint',
-			telephone: `+${CHANNELS.inn.number}`,
-			contactType: 'reservations',
-			areaServed: 'PH',
-			availableLanguage: 'en',
-		}),
-		clean({
-			'@type': 'ContactPoint',
-			telephone: `+${CHANNELS.dive.number}`,
-			contactType: 'customer service',
-			name: DIVE_CENTRE.name,
-			areaServed: 'PH',
-			availableLanguage: 'en',
-		}),
-	];
-}
-
 function address() {
 	return clean({
 		'@type': 'PostalAddress',
@@ -66,46 +45,12 @@ function geo() {
 	};
 }
 
-/** Homepage: the inn itself. */
-export function lodgingBusinessSchema(options: {
-	site: URL | undefined;
-	ogImage: string;
-	rooms: { title: string; sleeps: number }[];
-}) {
-	const { site, ogImage, rooms } = options;
-
-	return clean({
-		'@context': 'https://schema.org',
-		'@type': 'LodgingBusiness',
-		'@id': absolute('/#lodging', site),
-		name: SITE.name,
-		description: SITE.description,
-		url: absolute('/', site),
-		image: absolute(ogImage, site),
-		address: address(),
-		geo: geo(),
-		hasMap: CONTACT.mapsUrl,
-		email: CONTACT.email,
-		telephone: `+${CHANNELS.inn.number}`,
-		contactPoint: contactPoints(),
-		sameAs: [CONTACT.facebook, CONTACT.instagram].filter((url) => !isPlaceholder(url)),
-		petsAllowed: undefined,
-		containsPlace: rooms.map((room) =>
-			clean({
-				'@type': 'Accommodation',
-				name: room.title,
-				occupancy: {
-					'@type': 'QuantitativeValue',
-					maxValue: room.sleeps,
-					unitCode: 'C62',
-				},
-			}),
-		),
-	});
-}
-
-/** /diving: the dive offering, and the sites as attractions. */
-export function divingSchema(options: {
+/**
+ * The dive centre itself, with its courses as an offer catalogue. A local
+ * business rather than a bare Service, so it can carry the address, map and
+ * phone that local search results show.
+ */
+export function diveCentreSchema(options: {
 	site: URL | undefined;
 	ogImage: string;
 	courses: { title: string; suitableFor: string }[];
@@ -114,19 +59,18 @@ export function divingSchema(options: {
 
 	return clean({
 		'@context': 'https://schema.org',
-		'@type': 'Service',
-		'@id': absolute('/diving#service', site),
-		serviceType: 'Scuba diving and dive courses',
-		name: `Diving with ${DIVE_CENTRE.name}`,
-		description: `Guided dives and dive courses on ${SITE.place.island}, ${SITE.place.province}, Philippines.`,
-		url: absolute('/diving', site),
+		'@type': 'SportsActivityLocation',
+		'@id': absolute('/#dive-centre', site),
+		name: SITE.name,
+		description: SITE.description,
+		url: absolute('/', site),
 		image: absolute(ogImage, site),
-		provider: clean({
-			'@type': 'LocalBusiness',
-			name: DIVE_CENTRE.name,
-			hasMap: DIVE_CENTRE.reviewsUrl,
-			telephone: `+${CHANNELS.dive.number}`,
-		}),
+		address: address(),
+		geo: geo(),
+		hasMap: CONTACT.mapsUrl,
+		email: CONTACT.email,
+		telephone: `+${CONTACT.whatsapp}`,
+		sameAs: [CONTACT.facebook, CONTACT.instagram].filter((url) => !isPlaceholder(url)),
 		areaServed: clean({
 			'@type': 'Place',
 			name: `${SITE.place.island}, ${SITE.place.province}, ${SITE.place.country}`,
@@ -146,7 +90,7 @@ export function divingSchema(options: {
 	});
 }
 
-/** Both pages: helps search engines render the site name and breadcrumb. */
+/** Helps search engines render the site name and breadcrumb. */
 export function websiteSchema(site: URL | undefined) {
 	return clean({
 		'@context': 'https://schema.org',

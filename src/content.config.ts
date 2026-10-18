@@ -11,33 +11,12 @@ import { z } from 'astro/zod';
  * not Zod, is what stops those reaching production.
  */
 
-/** A value awaiting confirmation, e.g. `TODO_RATE_GARDEN` or a real figure. */
+/** A value awaiting confirmation, e.g. `TODO_PRICE_OPEN_WATER` or a real figure. */
 const unconfirmed = z.string().min(1);
 
-/** Filename of a photo in src/assets/images, e.g. `room-garden.jpg`. */
+/** Filename of a photo in src/assets/images, e.g. `dive-site-house-reef.jpg`. */
 const imageFile = z.string().regex(/^[a-z0-9-]+\.(jpg|png|webp)$/, {
-	message: 'Use a lowercase, hyphenated filename with an extension, e.g. room-garden.jpg',
-});
-
-const rooms = defineCollection({
-	loader: glob({ pattern: '**/*.md', base: './src/content/rooms' }),
-	schema: z.object({
-		title: z.string(),
-		/** Display order in the rooms section. Lower is first. */
-		order: z.number().int(),
-		/** How many people the room sleeps. Confirmed: rooms are 1, 2 and 4 person. */
-		sleeps: z.number().int().positive(),
-		/** One or two sentences on the card. */
-		summary: z.string().max(240),
-		/** Indicative nightly rate. Placeholder until the owner confirms. */
-		rate: unconfirmed,
-		/** Qualifier shown beside the rate, e.g. "per night, two sharing". */
-		rateNote: z.string().optional(),
-		features: z.array(z.string()).default([]),
-		image: imageFile,
-		imageAlt: z.string().min(1),
-		draft: z.boolean().default(false),
-	}),
+	message: 'Use a lowercase, hyphenated filename with an extension, e.g. dive-site-house-reef.jpg',
 });
 
 const diveSites = defineCollection({
@@ -54,7 +33,7 @@ const diveSites = defineCollection({
 		 */
 		depthMaxM: z.number().positive().optional(),
 		difficulty: z.enum(['TODO_DIFFICULTY', 'beginner', 'intermediate', 'advanced']),
-		/** Boat time from the inn. Unconfirmed. */
+		/** Boat time from the shore. Unconfirmed. */
 		boatTime: unconfirmed,
 		/** What you see down there. */
 		highlights: z.array(z.string()).min(1),
@@ -99,7 +78,7 @@ const courses = defineCollection({
 	}),
 });
 
-/** One leg of the journey to the inn. Durations and fares are unconfirmed. */
+/** One leg of the journey to Bantayan. Durations and fares are unconfirmed. */
 const journeyLeg = z.object({
 	from: z.string(),
 	to: z.string(),
@@ -137,4 +116,4 @@ const pages = defineCollection({
 	}),
 });
 
-export const collections = { rooms, diveSites, courses, pages };
+export const collections = { diveSites, courses, pages };

@@ -1,10 +1,6 @@
 ---
 /**
- * The document shell for both pages.
- *
- * `theme` chooses which end of the depth scale the page sits at: `surface` for
- * the homepage, `deep` for /diving. Everything else — palette, rail colours,
- * focus ring — follows from that one attribute.
+ * The document shell.
  */
 import { SITE, ANALYTICS } from '../config/site';
 import { IS_PREVIEW } from '../config/preview';
@@ -20,20 +16,13 @@ import bodyFont from '../assets/fonts/instrument-sans-latin-wght-normal.woff2';
 interface Props {
 	title: string;
 	description: string;
-	theme?: 'surface' | 'deep';
 	/** Path of the OG image in /public, absolute from the site root. */
 	ogImage?: string;
 	/** Structured data objects, serialised into ld+json. */
 	jsonLd?: Record<string, unknown>[];
 }
 
-const {
-	title,
-	description,
-	theme = 'surface',
-	ogImage = '/og-default.png',
-	jsonLd = [],
-} = Astro.props;
+const { title, description, ogImage = '/og-default.png', jsonLd = [] } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImageUrl = new URL(ogImage, Astro.site).href;
@@ -48,7 +37,7 @@ const analyticsToken = isPlaceholder(ANALYTICS.cloudflareToken) ? null : ANALYTI
 ---
 
 <!doctype html>
-<html lang={SITE.locale} data-theme={theme} data-rail={Astro.slots.has('rail') ? '' : undefined}>
+<html lang={SITE.locale} data-rail={Astro.slots.has('rail') ? '' : undefined}>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -77,7 +66,7 @@ const analyticsToken = isPlaceholder(ANALYTICS.cloudflareToken) ? null : ANALYTI
 		<meta name="twitter:description" content={description} />
 		<meta name="twitter:image" content={ogImageUrl} />
 
-		<!-- Geo-targeting: divers find this resort through search. -->
+		<!-- Geo-targeting: divers find the dive centre through search. -->
 		<meta name="geo.region" content={`${SITE.region}-CEB`} />
 		<meta name="geo.placename" content={`${SITE.place.island}, ${SITE.place.province}`} />
 

@@ -1,7 +1,6 @@
 ---
 /**
- * One course. Its CTA uses the dive centre's WhatsApp line, not the inn's,
- * and prefills the course name.
+ * One course. Its CTA prefills the course name.
  */
 import Placeholder from './primitives/Placeholder.astro';
 import Stat from './primitives/Stat.astro';
@@ -99,7 +98,7 @@ const headingId = `course-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 	}
 
 	<div class="course__cta">
-		<WhatsAppLink channel="dive" context={context} label="Ask about this" variant="ghost" />
+		<WhatsAppLink context={context} label="Ask about this" variant="ghost" />
 	</div>
 </article>
 

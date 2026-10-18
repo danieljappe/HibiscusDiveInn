@@ -4,15 +4,27 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
-# Hibiscus Coral Inn — Build Brief
+# Island Divers — Build Brief
 
-> **Client direction, Sep 2026 (supersedes the brief where they conflict):**
-> The resort is renamed **Hibiscus Coral Inn** (formerly Hibiscus Dive Inn).
-> Marketing focuses on the **rooms**; diving is secondary. Diving is run by the
-> owners' own dive centre, **Island Divers**, which lives at `/diving` on this
-> domain for now and may get its own site later. Room details are still
-> placeholders until the owner finishes the rooms. The depth rail appears on
-> `/diving` only — not on the homepage.
+> **Current direction, Oct 2026 (supersedes everything below where they conflict):**
+> This repo is the **Island Divers** dive centre site, and only that. The rooms
+> moved to their own site, **Hibiscus Coral Inn** (`../HibiscusCoralInn`). This
+> site mentions the inn once, as a small "Somewhere to stay" note plus footer
+> and menu links (`INN` in `src/config/site.ts`). Do not grow rooms back in.
+>
+> - One page at `/`: intro (0m), dive sites, courses, equipment, instructor,
+>   getting here, contact (-48m). `/diving` 301s to `/` via `public/_redirects`.
+> - The whole site uses the dark palette; the sand "surface" theme is gone.
+>   The depth rail runs on `/` from 0m down.
+> - One WhatsApp line (the dive number). Structured data is
+>   `SportsActivityLocation`, not `LodgingBusiness`.
+> - Sticky header with a `<details>` hamburger menu below 1200px, inline links
+>   above. The menu panel opens beside the depth rail, never over it, and shows
+>   each section's depth. It works without JS; a few inline lines close it on
+>   link tap, Escape and outside tap.
+>
+> Sections 1, 3, 4 and 6 below describe the old combined inn + diving site.
+> Read them for the design system and quality bar, not for page structure.
 
 Static marketing site for a small dive resort on **Bantayan Island, Cebu, Philippines**.
 Mobile-first. No booking system. Enquiries go to WhatsApp.

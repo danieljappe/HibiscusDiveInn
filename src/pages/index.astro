@@ -1,52 +1,84 @@
 ---
 /**
- * The homepage. It sits at the surface and has no depth rail — the rail
- * belongs to /diving, where the descent actually happens.
+ * The Island Divers site, on one page. It starts at the surface and descends:
+ * the depth rail tracks the reader down through the dive sites to the contact
+ * section at the bottom.
  */
 import { getCollection } from 'astro:content';
 
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import DepthRail from '../components/DepthRail.astro';
 
-import Hero from '../components/sections/home/Hero.astro';
-import About from '../components/sections/home/About.astro';
-import Rooms from '../components/sections/home/Rooms.astro';
-import DivingTeaser from '../components/sections/home/DivingTeaser.astro';
-import GettingHere from '../components/sections/home/GettingHere.astro';
-import Contact from '../components/sections/home/Contact.astro';
+import Intro from '../components/sections/diving/Intro.astro';
+import DiveSites from '../components/sections/diving/DiveSites.astro';
+import Courses from '../components/sections/diving/Courses.astro';
+import Equipment from '../components/sections/diving/Equipment.astro';
+import Instructor from '../components/sections/diving/Instructor.astro';
+import GettingHere from '../components/sections/diving/GettingHere.astro';
+import DiveContact from '../components/sections/diving/DiveContact.astro';
 
 import { SITE } from '../config/site';
-import { lodgingBusinessSchema, websiteSchema } from '../lib/schema';
+import { INTRO_DEPTH, TAIL_DEPTHS, railDepthsForSites } from '../config/depths';
+import { NAV_SECTIONS, type NavItem } from '../config/nav';
+import { diveCentreSchema, websiteSchema } from '../lib/schema';
+import { isPlaceholder } from '../lib/placeholders';
 
-const description = `${SITE.description} Enquiries by WhatsApp.`;
+const title = `Diving ${SITE.place.island}, ${SITE.place.province}`;
+const description =
+	`${SITE.name}: diving and dive courses on ${SITE.place.island}, ${SITE.place.province}. ` +
+	`A house reef you can walk into, small groups, and one instructor. Enquiries by WhatsApp.`;
 const ogImage = '/og-default.png';
 
-const rooms = (await getCollection('rooms', ({ data }) => !data.draft))
+const sites = (await getCollection('diveSites', ({ data }) => !data.draft)).sort(
+	(a, b) => a.data.order - b.data.order,
+);
+
+const courses = (await getCollection('courses', ({ data }) => !data.draft))
 	.sort((a, b) => a.data.order - b.data.order)
-	.map(({ data }) => ({ title: data.title, sleeps: data.sleeps }));
+	.map(({ data }) => ({ title: data.title, suitableFor: data.suitableFor }));
+
+/*
+ * The rail descends from the surface through the dive sites. Sites are spaced
+ * evenly until every one has a real depthMaxM, at which point it sorts by
+ * measured depth instead.
+ */
+const siteTicks = railDepthsForSites(
+	sites.map((site) => ({
+		id: `dive-site-${site.id}`,
+		label: isPlaceholder(site.data.title) ? 'Dive site' : site.data.title,
+		depthMaxM: site.data.depthMaxM,
+	})),
+);
+
+const ticks = [INTRO_DEPTH, ...siteTicks, ...TAIL_DEPTHS];
+
+/* The menu shows each section's depth; the dive sites start at the shallowest. */
+const depthOf = (id: string) =>
+	id === 'dive-sites'
+		? Math.min(...siteTicks.map((tick) => tick.depth))
+		: ticks.find((tick) => tick.id === id)?.depth;
+
+const nav: NavItem[] = NAV_SECTIONS.map((item) => ({ ...item, depth: depthOf(item.id) }));
 
 const jsonLd = [
 	websiteSchema(Astro.site),
-	lodgingBusinessSchema({ site: Astro.site, ogImage, rooms }),
+	diveCentreSchema({ site: Astro.site, ogImage, courses }),
 ];
 ---
 
-<BaseLayout
-	title={SITE.name}
-	description={description}
-	theme="surface"
-	ogImage={ogImage}
-	jsonLd={jsonLd}
->
-	<Header slot="header" current="home" />
+<BaseLayout title={title} description={description} ogImage={ogImage} jsonLd={jsonLd}>
+	<DepthRail slot="rail" ticks={ticks} />
+	<Header slot="header" nav={nav} />
 
-	<Hero />
-	<About />
-	<Rooms />
-	<DivingTeaser />
+	<Intro />
+	<DiveSites />
+	<Courses />
+	<Equipment />
+	<Instructor />
 	<GettingHere />
-	<Contact />
+	<DiveContact />
 
-	<Footer slot="footer" theme="deep" />
+	<Footer slot="footer" />
 </BaseLayout>

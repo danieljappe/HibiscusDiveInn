@@ -1,11 +1,11 @@
 ---
 /**
- * -12m. The page header, continuing the descent from the homepage teaser.
- * Carries the page's single <h1>.
+ * 0m, the surface. The page header, and the page's single <h1>.
  */
 import { render } from 'astro:content';
 import { requirePage } from '../../../lib/content';
 import Photo from '../../primitives/Photo.astro';
+import { SITE } from '../../../config/site';
 
 const entry = await requirePage('diving-intro');
 const { Content } = await render(entry);
@@ -21,7 +21,7 @@ const { Content } = await render(entry);
 	</div>
 
 	<div class="intro__body container">
-		<p class="eyebrow">Diving</p>
+		<p class="eyebrow">{SITE.name}</p>
 		<h1 class="intro__title">{entry.data.title}</h1>
 		{entry.data.intro && <p class="intro__lede">{entry.data.intro}</p>}
 	</div>

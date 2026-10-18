@@ -1,8 +1,8 @@
 /*
  * Design tokens.
  *
- * The system is built on depth. The homepage sits at the surface (sand, warm);
- * /diving is submerged (abyss, quiet). Two themes, one scale.
+ * The system is built on depth. The whole site is submerged — abyss, quiet —
+ * and the depth rail marks how far down the reader is.
  */
 
 :root {
@@ -75,62 +75,35 @@
 	/* ---- Depth rail ----------------------------------------------------- */
 	--rail-width: clamp(20px, 5vw, 28px);
 
+	/* ---- Header --------------------------------------------------------- */
+	/* A 44px tap target, its padding, and the 1px rule underneath. */
+	--header-padding: var(--space-2xs);
+	--header-height: calc(44px + 2 * var(--header-padding) + 1px);
+
 	/* ---- Motion --------------------------------------------------------- */
 	--ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 	--duration-fast: 120ms;
 	--duration-base: 220ms;
 }
 
-/* Pages without a depth rail (the homepage) give its gutter back to the content. */
+/* A page without a depth rail gives its gutter back to the content. */
 :root:not([data-rail]) {
 	--rail-width: 0px;
 }
 
 /*
- * ---- Themes -------------------------------------------------------------
- * `surface` is the homepage, `deep` is /diving. Semantic tokens are the only
- * thing components reference; raw palette names stay in this file.
+ * ---- Semantic tokens ------------------------------------------------------
+ * Components reference these; raw palette names stay in this file.
  *
- * Contrast, measured against the palette above (WCAG 2.1 ratios):
- *   abyss on sand ............ 11.3:1  AAA
- *   abyss on shell ........... 15.0:1  AAA
- *   midwater on sand .......... 5.2:1  AA
+ * Contrast, measured against the palette above (WCAG 2.1 ratios), and
+ * re-checked by `npm run check:contrast`:
  *   shell on abyss ........... 15.0:1  AAA
  *   shallow on abyss .......... 7.0:1  AAA
- *   abyss on signal ........... 8.7:1  AAA   <- the only safe use of signal
+ *   abyss on signal ........... 8.7:1  AAA
  *   signal on abyss ........... 8.7:1  AAA
- *   signal on sand ............ 1.3:1  FAILS <- never as text or a hairline
- *
- * On the surface theme, --signal may only ever be a filled background with
- * abyss text on it. It is never a text colour, border, or focus ring there.
  */
 
-[data-theme='surface'] {
-	--bg: var(--sand);
-	--bg-raised: var(--shell);
-	--bg-sunk: #d0c6b3;
-	--fg: var(--abyss);
-	--fg-muted: #43525a;
-	/* Decorative hairline. Not held to 3:1 — it separates, it does not inform. */
-	--rule: #b5a992;
-	--link: var(--midwater);
-	--link-hover: var(--abyss);
-
-	--cta-bg: var(--signal);
-	--cta-fg: var(--abyss);
-	--cta-bg-hover: #f09420;
-	--cta-border: transparent;
-
-	--cta-ghost-fg: var(--abyss);
-	--cta-ghost-border: var(--abyss);
-
-	--focus-ring: var(--abyss);
-	--rail-line: #b5a992;
-	--rail-tick: #5e6c75;
-	--rail-active: var(--abyss);
-}
-
-[data-theme='deep'] {
+:root {
 	--bg: var(--abyss);
 	--bg-raised: #0e2f42;
 	--bg-sunk: #05161f;
@@ -153,4 +126,7 @@
 	--rail-line: #24505f;
 	--rail-tick: #7d9aa6;
 	--rail-active: var(--signal);
+
+	/* Abyss, nearly opaque, so content blurs rather than shows through. */
+	--header-bg: rgb(8 32 46 / 0.94);
 }
